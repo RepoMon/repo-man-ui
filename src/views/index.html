@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+<h1>Configured repositories</h1>
+<ul id="repositories">
+    {% for repo in repositories %}
+        <li><a href="{{ repo }}">{{ repo }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

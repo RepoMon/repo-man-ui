@@ -29,7 +29,7 @@ $app->get('/', function(Request $request) use ($app){
 
     $data = ['one' => 'https://github.com/timothy-r/rndr-twig'];
 
-    return $app['twig']->render('index.twig', [
+    return $app['twig']->render('index.html', [
         'repositories' => $data,
     ]);
 });
