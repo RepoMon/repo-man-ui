@@ -1,11 +1,11 @@
 <?php
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 use Silex\Application;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
@@ -22,17 +22,21 @@ $app->register(new TwigServiceProvider(), [
     'twig.path' => __DIR__.'/views',
 ]);
 
+// get the host from config
+$client = new Client([
+    'base_uri' => 'http://repoman'
+]);
+
 /**
  * show a list of repositories
  */
-$app->get('/', function(Request $request) use ($app){
+$app->get('/', function(Request $request) use ($app, $client){
 
-    // get the host from config
-    $client = new Client([
-        'base_uri' => 'http://repoman'
+    $response = $client->request('GET', '/repositories', [
+        'headers' => [
+            'Accept' => 'application/json'
+        ]
     ]);
-
-    $response = $client->request('GET', '/repositories');
 
     $data = json_decode($response->getBody(), true);
 
@@ -43,22 +47,33 @@ $app->get('/', function(Request $request) use ($app){
 
 /**
  * add a repository
- * validate here or on repo-man service?
  */
-$app->post('/', function(Request $request) use ($app){
+$app->post('/', function(Request $request) use ($app,  $client){
 
-    // get the host from config
-    $client = new Client([
-        'base_uri' => 'http://repoman'
-    ]);
-
-    $client->request('POST', '/repositories',
-        ['form_params' => [
+    $client->request('POST', '/repositories', [
+        'form_params' => [
             'url' => $request->get('repository')
-        ]]);
+        ]
+    ]);
 
     // redirect to GET /
     return $app->redirect('/');
+});
+
+/**
+ * show dependency report
+ */
+$app->get('/report/dependency', function(Request $request) use ($app, $client){
+
+    $response = $client->request('GET', '/dependencies/report', [
+        'headers' => [
+            'Accept' => 'text/html'
+        ]
+    ]);
+
+    return $app['twig']->render('dependency-report.html', [
+        'report' => $response->getBody(),
+    ]);
 });
 
 /**

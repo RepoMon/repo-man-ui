@@ -3,14 +3,14 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
-<h1>Configured repositories</h1>
+<h1>Repositories</h1>
 <ul id="repositories">
     {% for repo in repositories %}
         <li><a href="{{ repo }}">{{ repo }}</a></li>
     {% endfor %}
 </ul>
 
-<h1>Add one</h1>
+<h1>Add</h1>
 <form action="/" method="post">
     <input type="text" name="repository" value=""/>
     <input type="submit" name="submit" value="Add"/>
