@@ -11,6 +11,8 @@ use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
 use Silex\Provider\TwigServiceProvider;
 
+use GuzzleHttp\Client;
+
 $app = new Application();
 
 $app['logger'] = new Logger('log');
@@ -25,9 +27,16 @@ $app->register(new TwigServiceProvider(), [
  */
 $app->get('/', function(Request $request) use ($app){
 
-    // make a request to the repo-man service /repositories endpoint
+    // get the host from config
+    $client = new Client([
+        'base_uri' => 'http://repoman'
+    ]);
 
-    $data = ['one' => 'https://github.com/timothy-r/rndr-twig'];
+    $response = $client->request('GET', '/repositories');
+
+    $data = json_decode($response->getBody(), true);
+
+    //['one' => 'https://github.com/timothy-r/rndr-twig'];
 
     return $app['twig']->render('index.html', [
         'repositories' => $data,
