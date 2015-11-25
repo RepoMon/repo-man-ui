@@ -36,13 +36,30 @@ $app->get('/', function(Request $request) use ($app){
 
     $data = json_decode($response->getBody(), true);
 
-    //['one' => 'https://github.com/timothy-r/rndr-twig'];
-
     return $app['twig']->render('index.html', [
         'repositories' => $data,
     ]);
 });
 
+/**
+ * add a repository
+ * validate here or on repo-man service?
+ */
+$app->post('/', function(Request $request) use ($app){
+
+    // get the host from config
+    $client = new Client([
+        'base_uri' => 'http://repoman'
+    ]);
+
+    $client->request('POST', '/repositories',
+        ['form_params' => [
+            'url' => $request->get('repository')
+        ]]);
+
+    // redirect to GET /
+    return $app->redirect('/');
+});
 
 /**
  */
