@@ -1,21 +1,38 @@
 <?php
 
 use Silex\Application;
-use Symfony\Component\HttpFoundation\Response;
 
-//use Sce\RepoMan\Provider\Config as ConfigProvider;
-//use Sce\RepoMan\Provider\Log as LogProvider;
-//use Sce\RepoMan\Provider\Route as RouteProvider;
-//use Sce\RepoMan\Provider\ErrorHandler as ErrorHandlerProvider;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+use Monolog\Logger;
+use Monolog\Handler\ErrorLogHandler;
+use Silex\Provider\TwigServiceProvider;
+
 $app = new Application();
 
-//$app->register(new ConfigProvider($dir));
-//$app->register(new LogProvider());
-//$app->register(new ErrorHandlerProvider());
-//$app->register(new RouteProvider());
+$app['logger'] = new Logger('log');
+$app['logger']->pushHandler(new ErrorLogHandler());
+
+$app->register(new TwigServiceProvider(), [
+    'twig.path' => __DIR__.'/views',
+]);
+
+/**
+ * show a list of repositories
+ */
+$app->get('/', function(Request $request) use ($app){
+
+    // make a request to the repo-man service /repositories endpoint
+
+    $data = ['one' => 'https://github.com/timothy-r/rndr-twig'];
+
+    return $app['twig']->render('index.twig', [
+        'repositories' => $data,
+    ]);
+});
 
 
 /**
