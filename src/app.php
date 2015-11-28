@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
 use Silex\Provider\TwigServiceProvider;
+use Silex\Provider\SessionServiceProvider;
 
 use GuzzleHttp\Client;
 
@@ -22,10 +23,20 @@ $app->register(new TwigServiceProvider(), [
     'twig.path' => __DIR__.'/views',
 ]);
 
+$app->register(new SessionServiceProvider() , [
+    'cookie_lifetime' => 60 * 60 * 24
+]);
+
 // get the host from config
 $client = new Client([
     'base_uri' => 'http://repoman'
 ]);
+
+$require_authn = function(Request $request) use ($app) {
+    if (null === $app['session']->get('user')) {
+        return $app->redirect('/login');
+    }
+};
 
 /**
  * show a list of repositories
@@ -33,7 +44,7 @@ $client = new Client([
 $app->get('/', function(Request $request) use ($app, $client){
 
     $response = $client->request('GET', '/repositories', [
-        'headers' => [
+       'headers' => [
             'Accept' => 'application/json'
         ]
     ]);
@@ -42,7 +53,61 @@ $app->get('/', function(Request $request) use ($app, $client){
 
     return $app['twig']->render('index.html', [
         'repositories' => $data,
+        'user' => $app['session']->get('user')
     ]);
+
+})->before($require_authn);
+
+/**
+ *
+ */
+$app->get('/login', function(Request $request) use ($app){
+
+    return $app['twig']->render('login.html', [
+        'client_id' => getenv('GH_BASIC_CLIENT_ID')
+    ]);
+});
+
+/**
+ *
+ */
+$app->get('/authn-callback', function(Request $request) use ($app) {
+
+    $session_code = $request->get('code');
+    $client = new Client();
+
+    // get the access token
+    $authn_result = $client->request('POST', 'https://github.com/login/oauth/access_token', [
+        'form_params' => [
+            'client_id' => getenv('GH_BASIC_CLIENT_ID'),
+            'client_secret' => getenv('GH_BASIC_CLIENT_SECRET'),
+            'code' => $session_code,
+        ],
+        'headers' => [
+            'Accept' => 'application/json'
+        ]
+    ]);
+
+    $authn_data = json_decode($authn_result->getBody(), true);
+
+    // get the user details
+    $user_result = $client->request('GET', 'https://api.github.com/user', [
+        'query' => [
+            'access_token' => $authn_data['access_token']
+        ],
+        'headers' => [
+            'Accept' => 'application/json'
+        ]
+    ]);
+
+    $user_data = json_decode($user_result->getBody(), true);
+    $app['session']->set('access_token', $authn_data['access_token']);
+    $scopes = explode(',', $authn_data['scope']);
+    $app['session']->set('scopes', $scopes);
+    $app['session']->set('user', $user_data);
+
+    return $app->redirect('/');
+
 });
 
 /**
@@ -56,9 +121,10 @@ $app->post('/', function(Request $request) use ($app,  $client){
         ]
     ]);
 
-    // redirect to GET /
+    // redirect to home page
     return $app->redirect('/');
-});
+
+})->before($require_authn);
 
 /**
  * show dependency report
@@ -74,7 +140,8 @@ $app->get('/report/dependency', function(Request $request) use ($app, $client){
     return $app['twig']->render('dependency-report.html', [
         'report' => $response->getBody(),
     ]);
-});
+
+})->before($require_authn);
 
 /**
  */

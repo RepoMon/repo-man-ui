@@ -3,6 +3,8 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
+{{ user.name }}
+
 <h1>Repositories</h1>
 <ul id="repositories">
     {% for repo in repositories %}
