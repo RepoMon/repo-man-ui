@@ -23,13 +23,14 @@ $app->register(new TwigServiceProvider(), [
     'twig.path' => __DIR__.'/views',
 ]);
 
-$app->register(new SessionServiceProvider() , [
+$app->register(new SessionServiceProvider(), [
     'cookie_lifetime' => 60 * 60 * 24
 ]);
 
-// get the host from config
 $client = new Client([
-    'base_uri' => 'http://repoman'
+    'headers' => [
+        'User-Agent' => 'RepoMon'
+    ]
 ]);
 
 $require_authn = function(Request $request) use ($app) {
@@ -39,20 +40,33 @@ $require_authn = function(Request $request) use ($app) {
 };
 
 /**
- * show a list of repositories
+ * show a list of repositories the user has access to and which ones are configured for updates
  */
 $app->get('/', function(Request $request) use ($app, $client){
 
-    $response = $client->request('GET', '/repositories', [
+    // get available repositories for the user from GH
+    $available_response = $client->request('GET', 'https://api.github.com/user/repos', [
+        'query' => [
+            'access_token' => $app['session']->get('access_token')
+        ],
+        'headers' => [
+            'Accept' => 'application/json'
+        ]
+    ]);
+
+    $available_data = json_decode($available_response->getBody(), true);
+
+    $configured_response = $client->request('GET', 'http://repoman/repositories', [
        'headers' => [
             'Accept' => 'application/json'
         ]
     ]);
 
-    $data = json_decode($response->getBody(), true);
+    $configured_data = json_decode($configured_response->getBody(), true);
 
     return $app['twig']->render('index.html', [
-        'repositories' => $data,
+        'configured' => $configured_data,
+        'available' => $available_data,
         'user' => $app['session']->get('user')
     ]);
 
@@ -115,7 +129,7 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
  */
 $app->post('/', function(Request $request) use ($app,  $client){
 
-    $client->request('POST', '/repositories', [
+    $client->request('POST', 'http://repoman/repositories', [
         'form_params' => [
             'url' => $request->get('repository')
         ]
@@ -131,7 +145,7 @@ $app->post('/', function(Request $request) use ($app,  $client){
  */
 $app->get('/report/dependency', function(Request $request) use ($app, $client){
 
-    $response = $client->request('GET', '/dependencies/report', [
+    $response = $client->request('GET', 'http://repoman/dependencies/report', [
         'headers' => [
             'Accept' => 'text/html'
         ]
