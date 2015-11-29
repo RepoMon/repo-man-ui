@@ -3,13 +3,31 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
+<div>
 {{ user.name }}
+    <h1>Repositories</h1>
+</div>
 
-<h1>Repositories</h1>
-<ul id="available">
-    {% for repo in available %}
-    <li><input type="checkbox" value="{{ repo.full_name }}"><a href="{{ repo.html_url }}">{{ repo.full_name }}</a></li>
-    {% endfor %}
-</ul>
+<div class="repository-list">
+
+    <ul id="available">
+        {% for repo in available %}
+        <li><input type="checkbox" value="{{ repo.full_name }}"><a href="{{ repo.html_url }}">{{ repo.full_name }}</a></li>
+        {% endfor %}
+    </ul>
+
+</div>
+
+<div class="config-form">
+    <form>
+        <input type="text" name="repository" value="">
+        <input type="text" name="language" value="PHP5.6">
+        <input type="text" name="dependency_manager" value="composer">
+        <input type="text" name="frequency" value="daily">
+        <input type="text" name="hour" value="1">
+        <input type="text" name="timezone" value="GMT">
+        <input type="submit" name="submit" value="Update">
+    </form>
+</div>
 
 {% endblock %}

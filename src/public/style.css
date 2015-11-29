@@ -5,3 +5,11 @@
 #footer {
     font-size: x-small;
 }
+
+.config-form {
+    float: right;
+}
+
+.repository-list {
+    float: left;
+}
