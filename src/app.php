@@ -56,13 +56,18 @@ $app->get('/', function(Request $request) use ($app, $client){
 
     $available_data = json_decode($available_response->getBody(), true);
 
-    $configured_response = $client->request('GET', 'http://repoman/repositories', [
-       'headers' => [
-            'Accept' => 'application/json'
-        ]
-    ]);
+    $configured_data = [];
 
-    $configured_data = json_decode($configured_response->getBody(), true);
+    if (!getenv('HIDE_REPOMAN_DATA')) {
+        $configured_response = $client->request('GET', 'http://repoman/repositories', [
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ]);
+
+        $configured_data = json_decode($configured_response->getBody(), true);
+    }
+
 
     return $app['twig']->render('index.html', [
         'configured' => $configured_data,
@@ -73,7 +78,23 @@ $app->get('/', function(Request $request) use ($app, $client){
 })->before($require_authn);
 
 /**
- *
+ * add a repository
+ */
+$app->post('/', function(Request $request) use ($app,  $client){
+
+    $client->request('POST', 'http://repoman/repositories', [
+        'form_params' => [
+            'url' => $request->get('repository')
+        ]
+    ]);
+
+    // redirect to home page
+    return $app->redirect('/');
+
+})->before($require_authn);
+
+/**
+ * show user link to authenticate
  */
 $app->get('/login', function(Request $request) use ($app){
 
@@ -84,7 +105,8 @@ $app->get('/login', function(Request $request) use ($app){
 });
 
 /**
- *
+ * authentication callback
+ * get an access token and set up a cookie session
  */
 $app->get('/authn-callback', function(Request $request) use ($app) {
 
@@ -124,22 +146,6 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
     return $app->redirect('/');
 
 });
-
-/**
- * add a repository
- */
-$app->post('/', function(Request $request) use ($app,  $client){
-
-    $client->request('POST', 'http://repoman/repositories', [
-        'form_params' => [
-            'url' => $request->get('repository')
-        ]
-    ]);
-
-    // redirect to home page
-    return $app->redirect('/');
-
-})->before($require_authn);
 
 /**
  * show dependency report
