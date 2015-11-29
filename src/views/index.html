@@ -10,7 +10,7 @@
 
 <div class="repository-list">
 
-    <ul id="available">
+    <ul id="repositories">
         {% for repo in available %}
         <li><input type="checkbox" value="{{ repo.full_name }}"><a href="{{ repo.html_url }}">{{ repo.full_name }}</a></li>
         {% endfor %}
@@ -19,13 +19,28 @@
 </div>
 
 <div class="config-form">
-    <form>
+    <form action="/" method="post">
         <input type="text" name="repository" value="">
-        <input type="text" name="language" value="PHP5.6">
-        <input type="text" name="dependency_manager" value="composer">
-        <input type="text" name="frequency" value="daily">
+<br>
+        <select name="language">
+            <option value="PHP5.6">PHP 5.6</option>
+            <option value="PHP7">PHP 7</option>
+            <option value="javascript">JavaScript</option>
+        </select>
+
+        <select name="dependency_manager">
+            <option value="composer">composer</option>
+            <option value="npm">npm</option>
+        </select>
+<br>
+        <select name="frequency">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+        </select>
+
         <input type="text" name="hour" value="1">
         <input type="text" name="timezone" value="GMT">
+<br>
         <input type="submit" name="submit" value="Update">
     </form>
 </div>
