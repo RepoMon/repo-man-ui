@@ -10,4 +10,4 @@ before_script:
   - composer install
 
 script:
-  phpunit --exclude-group filesystem Test/
+  phpunit Test/
