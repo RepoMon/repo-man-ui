@@ -8,7 +8,7 @@
 <h1>Repositories</h1>
 <ul id="available">
     {% for repo in available %}
-    <li><a href="{{ repo.html_url }}">{{ repo.full_name }}</a></li>
+    <li><input type="checkbox" value="{{ repo.full_name }}"><a href="{{ repo.html_url }}">{{ repo.full_name }}</a></li>
     {% endfor %}
 </ul>
 
