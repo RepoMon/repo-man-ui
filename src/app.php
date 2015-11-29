@@ -78,7 +78,8 @@ $app->get('/', function(Request $request) use ($app, $client){
 $app->get('/login', function(Request $request) use ($app){
 
     return $app['twig']->render('login.html', [
-        'client_id' => getenv('GH_BASIC_CLIENT_ID')
+        'authentication_service' => 'GitHub',
+        'endpoint' => 'https://github.com/login/oauth/authorize?scope=user,repo,public_repo&client_id=' . getenv('GH_BASIC_CLIENT_ID')
     ]);
 });
 
