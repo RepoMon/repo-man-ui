@@ -12,6 +12,8 @@ use Monolog\Handler\ErrorLogHandler;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 
+use Ace\RepoManUi\Provider\ConfigProvider;
+
 use GuzzleHttp\Client;
 
 $app = new Application();
@@ -26,6 +28,8 @@ $app->register(new TwigServiceProvider(), [
 $app->register(new SessionServiceProvider(), [
     'cookie_lifetime' => 60 * 60 * 24
 ]);
+
+$app->register(new ConfigProvider());
 
 $client = new Client([
     'headers' => [
@@ -44,8 +48,10 @@ $require_authn = function(Request $request) use ($app) {
  */
 $app->get('/', function(Request $request) use ($app, $client){
 
-    // get available repositories for the user from GH
-    $available_response = $client->request('GET', 'https://api.github.com/user/repos', [
+    $api_host = $app['config']->getRemoteApiHost();
+
+    // get available repositories for the user from remote api
+    $available_response = $client->request('GET', $api_host . '/user/repos', [
         'query' => [
             'access_token' => $app['session']->get('access_token')
         ],
@@ -59,7 +65,8 @@ $app->get('/', function(Request $request) use ($app, $client){
     $configured_data = [];
 
     if (!getenv('HIDE_REPOMAN_DATA')) {
-        $configured_response = $client->request('GET', 'http://repoman/repositories', [
+        $repo_man_host = $app['config']->getRepoManHost();
+        $configured_response = $client->request('GET', $repo_man_host . '/repositories', [
             'headers' => [
                 'Accept' => 'application/json'
             ]
@@ -82,7 +89,9 @@ $app->get('/', function(Request $request) use ($app, $client){
  */
 $app->post('/', function(Request $request) use ($app,  $client){
 
-    $client->request('POST', 'http://repoman/repositories', [
+    $repo_man_host = $app['config']->getRepoManHost();
+
+    $client->request('POST', $repo_man_host . '/repositories', [
         'form_params' => [
             'url' => $request->get('repository')
         ]
@@ -98,9 +107,14 @@ $app->post('/', function(Request $request) use ($app,  $client){
  */
 $app->get('/login', function(Request $request) use ($app){
 
+    $authn_host = $app['config']->getRemoteHost();
+    $client_id = $app['config']->getApiClientId();
+
+    $endpoint = sprintf("%s/login/oauth/authorize?scope=user,repo,public_repo&client_id=%s", $authn_host, $client_id);
+
     return $app['twig']->render('login.html', [
-        'authentication_service' => 'GitHub',
-        'endpoint' => 'https://github.com/login/oauth/authorize?scope=user,repo,public_repo&client_id=' . getenv('GH_BASIC_CLIENT_ID')
+        'authentication_service' => $app['config']->getAuthnServiceName(),
+        'endpoint' => $endpoint
     ]);
 });
 
@@ -113,11 +127,13 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
     $session_code = $request->get('code');
     $client = new Client();
 
+    $authn_host = $app['config']->getRemoteHost();
+
     // get the access token
-    $authn_result = $client->request('POST', 'https://github.com/login/oauth/access_token', [
+    $authn_result = $client->request('POST', $authn_host . '/login/oauth/access_token', [
         'form_params' => [
-            'client_id' => getenv('GH_BASIC_CLIENT_ID'),
-            'client_secret' => getenv('GH_BASIC_CLIENT_SECRET'),
+            'client_id' => $app['config']->getApiClientId(),
+            'client_secret' => $app['config']->getApiClientSecret(),
             'code' => $session_code,
         ],
         'headers' => [
@@ -127,8 +143,10 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
 
     $authn_data = json_decode($authn_result->getBody(), true);
 
+    $api_host = $app['config']->getRemoteApiHost();
+
     // get the user details
-    $user_result = $client->request('GET', 'https://api.github.com/user', [
+    $user_result = $client->request('GET', $api_host . '/user', [
         'query' => [
             'access_token' => $authn_data['access_token']
         ],
@@ -152,7 +170,9 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
  */
 $app->get('/report/dependency', function(Request $request) use ($app, $client){
 
-    $response = $client->request('GET', 'http://repoman/dependencies/report', [
+    $repo_man_host = $app['config']->getRepoManHost();
+
+    $response = $client->request('GET', $repo_man_host . '/dependencies/report', [
         'headers' => [
             'Accept' => 'text/html'
         ]
