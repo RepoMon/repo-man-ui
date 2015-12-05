@@ -46,7 +46,7 @@ class RabbitClient
 
         $channel->queue_declare($this->channel_name, false, false, false, false);
 
-        $msg = new AMQPMessage(json_encode($event), [
+        $msg = new AMQPMessage(json_encode($event, JSON_UNESCAPED_SLASHES), [
             'content_type' => 'application/json',
             'timestamp' => time()
         ]);

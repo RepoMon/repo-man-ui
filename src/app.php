@@ -35,7 +35,7 @@ $app->register(new RabbitClientProvider());
 
 $client = new Client([
     'headers' => [
-        'User-Agent' => 'RepoMon'
+        'User-Agent' => 'Repository Monitor v3.0.0'
     ]
 ]);
 
