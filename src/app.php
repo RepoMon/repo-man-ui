@@ -31,6 +31,7 @@ $app->register(new SessionServiceProvider(), [
 ]);
 
 $app->register(new ConfigProvider());
+$app->register(new RabbitClientProvider());
 
 $client = new Client([
     'headers' => [
@@ -93,9 +94,12 @@ $app->get('/', function(Request $request) use ($app, $client){
  */
 $app->post('/', function(Request $request) use ($app,  $client){
 
+    $user = $app['session']->get('user');
+
     $event = [
         'name' => 'repo-mon.repo.configured',
         'data' => [
+            'owner' => $user['name'],
             'url' => $request->get('repository'),
             'language' => $request->get('language'),
             'dependency_manager' => $request->get('dependency_manager'),
