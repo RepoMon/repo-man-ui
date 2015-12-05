@@ -13,6 +13,7 @@ use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 
 use Ace\RepoManUi\Provider\ConfigProvider;
+use Ace\RepoManUi\Provider\RabbitClientProvider;
 
 use GuzzleHttp\Client;
 
@@ -47,6 +48,9 @@ $require_authn = function(Request $request) use ($app) {
  * show a list of repositories the user has access to and which ones are configured for updates
  */
 $app->get('/', function(Request $request) use ($app, $client){
+
+    // get session token from the tokens service not from the session
+    // get a list of repos for the user (in the session) and store them in the session
 
     $api_host = $app['config']->getRemoteApiHost();
 
@@ -89,15 +93,20 @@ $app->get('/', function(Request $request) use ($app, $client){
  */
 $app->post('/', function(Request $request) use ($app,  $client){
 
-    $repo_man_host = $app['config']->getRepoManHost();
-
-    $client->request('POST', $repo_man_host . '/repositories', [
-        'form_params' => [
-            'url' => $request->get('repository')
+    $event = [
+        'name' => 'repo-mon.repo.configured',
+        'data' => [
+            'url' => $request->get('repository'),
+            'language' => $request->get('language'),
+            'dependency_manager' => $request->get('dependency_manager'),
+            'frequency' => $request->get('frequency'),
+            'hour' => $request->get('hour'),
+            'timezone' => $request->get('timezone'),
         ]
-    ]);
+    ];
 
-    // redirect to home page
+    $app['rabbit-client']->publish($event);
+
     return $app->redirect('/');
 
 })->before($require_authn);
@@ -156,10 +165,21 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
     ]);
 
     $user_data = json_decode($user_result->getBody(), true);
+
     $app['session']->set('access_token', $authn_data['access_token']);
     $scopes = explode(',', $authn_data['scope']);
     $app['session']->set('scopes', $scopes);
     $app['session']->set('user', $user_data);
+
+    $event = [
+        'name' => 'repo-mon.token.added',
+        'data' => [
+            'user' => $user_data['name'],
+            'token' => $authn_data['access_token']
+        ]
+    ];
+
+    $app['rabbit-client']->publish($event);
 
     return $app->redirect('/');
 

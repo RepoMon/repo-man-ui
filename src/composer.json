@@ -12,7 +12,8 @@
       "silex/silex": "1.3.*",
       "monolog/monolog": "~1.15",
       "twig/twig": "~1.23",
-      "guzzlehttp/guzzle": "^6.1"
+      "guzzlehttp/guzzle": "^6.1",
+      "videlalvaro/php-amqplib": "2.5.*"
     },
 
     "require-dev": {

@@ -24,22 +24,24 @@
 <br>
         <select name="language">
             <option value="PHP5.6">PHP 5.6</option>
-            <option value="PHP7">PHP 7</option>
-            <option value="javascript">JavaScript</option>
         </select>
 
         <select name="dependency_manager">
             <option value="composer">composer</option>
-            <option value="npm">npm</option>
         </select>
 <br>
         <select name="frequency">
             <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
         </select>
 
-        <input type="text" name="hour" value="1">
-        <input type="text" name="timezone" value="GMT">
+        <select name="hour">
+            <option value="1">1 am</option>
+        </select>
+
+        <select name="timezone">
+            <option value="GMT">GMT</option>
+        </select>
+
 <br>
         <input type="submit" name="submit" value="Update">
     </form>
