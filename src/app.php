@@ -99,7 +99,7 @@ $app->post('/', function(Request $request) use ($app,  $client){
     $event = [
         'name' => 'repo-mon.repo.configured',
         'data' => [
-            'owner' => $user['name'],
+            'owner' => $user['login'],
             'url' => $request->get('repository'),
             'language' => $request->get('language'),
             'dependency_manager' => $request->get('dependency_manager'),
@@ -178,7 +178,7 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
     $event = [
         'name' => 'repo-mon.token.added',
         'data' => [
-            'user' => $user_data['name'],
+            'user' => $user_data['login'],
             'token' => $authn_data['access_token']
         ]
     ];
