@@ -82,7 +82,7 @@ class RabbitClient
             'timestamp' => time()
         ]);
 
-        $this->channel->basic_publish($msg, '', $this->channel_name);
+        $this->channel->basic_publish($msg, $this->channel_name);
 
     }
 }
