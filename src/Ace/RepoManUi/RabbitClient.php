@@ -2,6 +2,7 @@
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Channel\AMQPChannel;;
 
 /**
  * @author timrodger
@@ -25,6 +26,16 @@ class RabbitClient
     private $channel_name;
 
     /**
+     * @var AMQPStreamConnection
+     */
+    private $connection;
+
+    /**
+     * @var AMQPChannel
+     */
+    private $channel;
+
+    /**
      * @param $host
      * @param $port
      * @param $channel_name
@@ -37,23 +48,41 @@ class RabbitClient
     }
 
     /**
+     *
+     */
+    private function connect()
+    {
+        if (!$this->connection) {
+            $this->connection = new AMQPStreamConnection($this->host, $this->port, 'guest', 'guest');
+            $this->channel = $this->connection->channel();
+            $this->channel->exchange_declare($this->channel_name, 'fanout', false, false, false);
+        }
+    }
+
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        if ($this->connection) {
+            $this->channel->close();
+            $this->connection->close();
+        }
+    }
+
+    /**
      * @param array $event
      */
     public function publish(array $event)
     {
-        $connection = new AMQPStreamConnection($this->host, $this->port, 'guest', 'guest');
-        $channel = $connection->channel();
-
-        $channel->queue_declare($this->channel_name, false, false, false, false);
+        $this->connect();
 
         $msg = new AMQPMessage(json_encode($event, JSON_UNESCAPED_SLASHES), [
             'content_type' => 'application/json',
             'timestamp' => time()
         ]);
-        $channel->basic_publish($msg, '', $this->channel_name);
 
-        $channel->close();
-        $connection->close();
+        $this->channel->basic_publish($msg, '', $this->channel_name);
 
     }
 }
