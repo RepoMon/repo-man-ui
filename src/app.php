@@ -57,16 +57,19 @@ $app->get('/', function(Request $request) use ($app, $client){
 
         $user = $app['session']->get('user');
 
-        // get session token from the token service not from the session
+        // get access token from the token service not from the session
         $token_host = $app['config']->getTokenHost();
-        $token = $client->request('GET', $token_host . '/tokens/' . $user['login'])->getBody();
+
+        // trim any white space from the response body
+        $token = trim($client->request('GET', $token_host . '/tokens/' . $user['login'])->getBody());
+
+        $app['logger']->addNotice("token: $token");
 
         // get a list of repositories for the logged in user and store them in the session
-
         $api_host = $app['config']->getRemoteApiHost();
 
         // get available repositories for the user from remote api
-        $available_response = $client->request('GET', $api_host . '/user/repos', [
+        $available = $client->request('GET', $api_host . '/user/repos', [
             'query' => [
                 'access_token' => $token
             ],
@@ -75,7 +78,7 @@ $app->get('/', function(Request $request) use ($app, $client){
             ]
         ]);
 
-        $available_repositories = json_decode($available_response->getBody(), true);
+        $available_repositories = json_decode($available->getBody(), true);
         $app['session']->set('available_repositories', $available_repositories);
     }
 
@@ -182,9 +185,6 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
 
     $user_data = json_decode($user_result->getBody(), true);
 
-    //$app['session']->set('access_token', $authn_data['access_token']);
-    #$scopes = explode(',', $authn_data['scope']);
-    #$app['session']->set('scopes', $scopes);
     $app['session']->set('user', $user_data);
 
     $event = [
