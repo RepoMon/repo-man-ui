@@ -19,6 +19,15 @@ class Configuration
     /**
      * @return string
      */
+    public function getTokenHost()
+    {
+        return 'http://token';
+    }
+
+
+    /**
+     * @return string
+     */
     public function getRemoteHost()
     {
         return 'https://github.com';

@@ -50,24 +50,36 @@ $require_authn = function(Request $request) use ($app) {
  */
 $app->get('/', function(Request $request) use ($app, $client){
 
-    // get session token from the tokens service not from the session
-    // get a list of repos for the user (in the session) and store them in the session
+    $available_repositories = $app['session']->get('available_repositories');
 
-    $api_host = $app['config']->getRemoteApiHost();
+    // provide this as a first class feature, to retrieve the available repositories for a user
+    if (!$available_repositories){
 
-    // get available repositories for the user from remote api
-    $available_response = $client->request('GET', $api_host . '/user/repos', [
-        'query' => [
-            'access_token' => $app['session']->get('access_token')
-        ],
-        'headers' => [
-            'Accept' => 'application/json'
-        ]
-    ]);
+        $user = $app['session']->get('user');
 
-    $available_data = json_decode($available_response->getBody(), true);
+        // get session token from the token service not from the session
+        $token_host = $app['config']->getTokenHost();
+        $token = $client->request('GET', $token_host . '/tokens/' . $user['login'])->getBody();
 
-    $configured_data = [];
+        // get a list of repositories for the logged in user and store them in the session
+
+        $api_host = $app['config']->getRemoteApiHost();
+
+        // get available repositories for the user from remote api
+        $available_response = $client->request('GET', $api_host . '/user/repos', [
+            'query' => [
+                'access_token' => $token
+            ],
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ]);
+
+        $available_repositories = json_decode($available_response->getBody(), true);
+        $app['session']->set('available_repositories', $available_repositories);
+    }
+
+    $configured_repositories = [];
 
     if (!getenv('HIDE_REPOMAN_DATA')) {
         $repo_man_host = $app['config']->getRepoManHost();
@@ -77,13 +89,13 @@ $app->get('/', function(Request $request) use ($app, $client){
             ]
         ]);
 
-        $configured_data = json_decode($configured_response->getBody(), true);
+        $configured_repositories = json_decode($configured_response->getBody(), true);
     }
 
 
     return $app['twig']->render('index.html', [
-        'configured' => $configured_data,
-        'available' => $available_data,
+        'configured' => $configured_repositories,
+        'available' => $available_repositories,
         'user' => $app['session']->get('user')
     ]);
 
@@ -123,7 +135,7 @@ $app->get('/login', function(Request $request) use ($app){
     $authn_host = $app['config']->getRemoteHost();
     $client_id = $app['config']->getApiClientId();
 
-    $endpoint = sprintf("%s/login/oauth/authorize?scope=user,repo,public_repo&client_id=%s", $authn_host, $client_id);
+    $endpoint = sprintf("%s/login/oauth/authorize?scope=user,public_repo&client_id=%s", $authn_host, $client_id);
 
     return $app['twig']->render('login.html', [
         'authentication_service' => $app['config']->getAuthnServiceName(),
@@ -170,9 +182,9 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
 
     $user_data = json_decode($user_result->getBody(), true);
 
-    $app['session']->set('access_token', $authn_data['access_token']);
-    $scopes = explode(',', $authn_data['scope']);
-    $app['session']->set('scopes', $scopes);
+    //$app['session']->set('access_token', $authn_data['access_token']);
+    #$scopes = explode(',', $authn_data['scope']);
+    #$app['session']->set('scopes', $scopes);
     $app['session']->set('user', $user_data);
 
     $event = [
