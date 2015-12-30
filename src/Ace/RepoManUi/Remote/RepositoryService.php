@@ -47,5 +47,7 @@ class RepositoryService
     {
         $token = $this->token_service->getToken($user);
 
+        $repositories = [];
+        return $repositories;
     }
 }
