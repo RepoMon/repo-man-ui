@@ -14,6 +14,8 @@ use Silex\Provider\SessionServiceProvider;
 
 use Ace\RepoManUi\Provider\ConfigProvider;
 use Ace\RepoManUi\Provider\RabbitClientProvider;
+use Ace\RepoManUi\Provider\TokenProvider;
+use Ace\RepoManUi\Provider\RepositoryServiceProvider;
 
 use GuzzleHttp\Client;
 
@@ -32,10 +34,12 @@ $app->register(new SessionServiceProvider(), [
 
 $app->register(new ConfigProvider());
 $app->register(new RabbitClientProvider());
+$app->register(new TokenProvider());
+$app->register(new RepositoryServiceProvider());
 
 $client = new Client([
     'headers' => [
-        'User-Agent' => 'Repository Monitor v3.0.0'
+        'User-Agent' => 'Repository Monitor v4.0.0'
     ]
 ]);
 
@@ -52,16 +56,18 @@ $app->get('/', function(Request $request) use ($app, $client){
 
     $available_repositories = $app['session']->get('available_repositories');
 
+    $user = $app['session']->get('user');
+
     // provide this as a first class feature, to retrieve the available repositories for a user
     if (!$available_repositories){
 
-        $user = $app['session']->get('user');
+        $token = $app['token-service']->getToken($user['login']);
 
         // get access token from the token service not from the session
-        $token_host = $app['config']->getTokenHost();
-
-        // trim any white space from the response body
-        $token = trim($client->request('GET', $token_host . '/tokens/' . $user['login'])->getBody());
+//        $token_host = $app['config']->getTokenHost();
+//
+//        // trim any white space from the response body
+//        $token = trim($client->request('GET', $token_host . '/tokens/' . $user['login'])->getBody());
 
         $app['logger']->addNotice("token: $token");
 

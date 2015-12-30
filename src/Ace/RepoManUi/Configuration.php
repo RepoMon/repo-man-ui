@@ -7,12 +7,25 @@
  */
 class Configuration
 {
+    public function getServiceName()
+    {
+        return 'Repository Monitor v4.0.0';
+    }
+
     /**
      * @return string
      */
     public function getRepoManHost()
     {
         return 'http://repoman';
+    }
+
+    /**
+     * @return string
+     */
+    public function getTokenService()
+    {
+        return 'http://token';
     }
 
     /**
