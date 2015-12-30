@@ -86,7 +86,7 @@ $app->get('/', function(Request $request) use ($app, $client){
 
     if (!getenv('HIDE_REPOMAN_DATA')) {
         $repo_man_host = $app['config']->getRepoManHost();
-        $configured_response = $client->request('GET', $repo_man_host . '/repositories', [
+        $configured_response = $client->request('GET', $repo_man_host . '/repositories/' . $user['login'], [
             'headers' => [
                 'Accept' => 'application/json'
             ]
