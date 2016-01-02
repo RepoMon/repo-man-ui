@@ -15,7 +15,7 @@ use Silex\Provider\SessionServiceProvider;
 use Ace\RepoManUi\Provider\ConfigProvider;
 use Ace\RepoManUi\Provider\RabbitClientProvider;
 use Ace\RepoManUi\Provider\TokenProvider;
-use Ace\RepoManUi\Provider\RepositoryServiceProvider;
+use Ace\RepoManUi\Provider\LocalRepositoryServiceProvider;
 
 use GuzzleHttp\Client;
 
@@ -35,7 +35,7 @@ $app->register(new SessionServiceProvider(), [
 $app->register(new ConfigProvider());
 $app->register(new RabbitClientProvider());
 $app->register(new TokenProvider());
-$app->register(new RepositoryServiceProvider());
+$app->register(new LocalRepositoryServiceProvider());
 
 $client = new Client([
     'headers' => [
