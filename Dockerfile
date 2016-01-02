@@ -29,17 +29,11 @@ COPY src/ /home/app/
 # remove any development cruft
 RUN rm -rf /home/app/vendor/*
 
-# create the directory to store the checked out repositories
-RUN mkdir /tmp/repositories
-
 WORKDIR /home/app
 
 # Install dependencies
 RUN composer install --prefer-dist && \
     apt-get clean
-
-RUN git config --global user.email "bot@service.update.net"
-RUN git config --global user.name "Automated user"
 
 WORKDIR /home/app/public
 

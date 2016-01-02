@@ -14,6 +14,9 @@ use Silex\Provider\SessionServiceProvider;
 
 use Ace\RepoManUi\Provider\ConfigProvider;
 use Ace\RepoManUi\Provider\RabbitClientProvider;
+use Ace\RepoManUi\Provider\TokenProvider;
+use Ace\RepoManUi\Provider\LocalRepositoryServiceProvider;
+use Ace\RepoManUi\Provider\GitRepositoryServiceProvider;
 
 use GuzzleHttp\Client;
 
@@ -32,10 +35,13 @@ $app->register(new SessionServiceProvider(), [
 
 $app->register(new ConfigProvider());
 $app->register(new RabbitClientProvider());
+$app->register(new TokenProvider());
+$app->register(new LocalRepositoryServiceProvider());
+$app->register(new GitRepositoryServiceProvider());
 
 $client = new Client([
     'headers' => [
-        'User-Agent' => 'Repository Monitor v3.0.0'
+        'User-Agent' => 'Repository Monitor v4.0.0'
     ]
 ]);
 
@@ -52,49 +58,20 @@ $app->get('/', function(Request $request) use ($app, $client){
 
     $available_repositories = $app['session']->get('available_repositories');
 
-    // provide this as a first class feature, to retrieve the available repositories for a user
+    $user = $app['session']->get('user');
+
+    // don't just store the repositories in the session, store them all in the "local repository service"
     if (!$available_repositories){
 
-        $user = $app['session']->get('user');
-
-        // get access token from the token service not from the session
-        $token_host = $app['config']->getTokenHost();
-
-        // trim any white space from the response body
-        $token = trim($client->request('GET', $token_host . '/tokens/' . $user['login'])->getBody());
-
-        $app['logger']->addNotice("token: $token");
-
-        // get a list of repositories for the logged in user and store them in the session
-        $api_host = $app['config']->getRemoteApiHost();
-
-        // get available repositories for the user from remote api
-        $available = $client->request('GET', $api_host . '/user/repos', [
-            'query' => [
-                'access_token' => $token
-            ],
-            'headers' => [
-                'Accept' => 'application/json'
-            ]
-        ]);
-
-        $available_repositories = json_decode($available->getBody(), true);
+        $available_repositories = $app['git-repository-service']->getRepositories($user['login'], 'GMT');
         $app['session']->set('available_repositories', $available_repositories);
     }
 
     $configured_repositories = [];
 
     if (!getenv('HIDE_REPOMAN_DATA')) {
-        $repo_man_host = $app['config']->getRepoManHost();
-        $configured_response = $client->request('GET', $repo_man_host . '/repositories', [
-            'headers' => [
-                'Accept' => 'application/json'
-            ]
-        ]);
-
-        $configured_repositories = json_decode($configured_response->getBody(), true);
+        $configured_repositories = $app['local-repository-service']->getRepositories($user['login']);
     }
-
 
     return $app['twig']->render('index.html', [
         'configured' => $configured_repositories,
@@ -118,8 +95,8 @@ $app->post('/', function(Request $request) use ($app,  $client){
             'url' => $request->get('repository'),
             'language' => $request->get('language'),
             'dependency_manager' => $request->get('dependency_manager'),
-            'frequency' => $request->get('frequency'),
-            'hour' => $request->get('hour'),
+            //'frequency' => $request->get('frequency'),
+            //'hour' => $request->get('hour'),
             'timezone' => $request->get('timezone'),
         ]
     ];

@@ -4,16 +4,28 @@
  * @author tim rodger
  * Date: 29/11/15
  *
- * @todo use env vars for the remote git host variables
  */
 class Configuration
 {
+    public function getServiceName()
+    {
+        return 'Repository Monitor v4.0.0';
+    }
+
     /**
      * @return string
      */
     public function getRepoManHost()
     {
         return 'http://repoman';
+    }
+
+    /**
+     * @return string
+     */
+    public function getTokenService()
+    {
+        return 'http://token';
     }
 
     /**
@@ -30,7 +42,7 @@ class Configuration
      */
     public function getRemoteHost()
     {
-        return 'https://github.com';
+        return getenv('GIT_HOST');
     }
 
     /**
@@ -38,7 +50,7 @@ class Configuration
      */
     public function getAuthnServiceName()
     {
-        return 'GitHub';
+        return $this->getRemoteHost();
     }
 
     /**
@@ -46,7 +58,7 @@ class Configuration
      */
     public function getRemoteApiHost()
     {
-        return 'https://api.github.com';
+        return getenv('GIT_API_HOST');
     }
 
     /**
