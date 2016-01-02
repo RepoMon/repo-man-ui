@@ -28,7 +28,8 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
      * @param $language
      * @param $manager
      */
-    public function testGetDependencyManager($language, $manager) {
+    public function testGetDependencyManager($language, $manager)
+    {
 
         $repository = new Repository('https://github.com/owner/repo', 'A repository', $language);
 
@@ -36,7 +37,8 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testRepositoryIsInactiveByDefault() {
+    public function testRepositoryIsInactiveByDefault()
+    {
 
         $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript');
 
@@ -47,7 +49,8 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($repository->isActive());
     }
 
-    public function testTimezoneIsEmptyByDefault() {
+    public function testTimezoneIsEmptyByDefault()
+    {
 
         $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript');
 
@@ -56,5 +59,26 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
         $repository->setTimezone('Europe/London');
 
         $this->assertSame('Europe/London', $repository->getTimezone());
+    }
+
+    public function testGetFullName()
+    {
+        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript');
+
+        $this->assertSame('owner/repo', $repository->getFullName());
+    }
+
+    public function testGetOwner()
+    {
+        $repository = new Repository('https://github.com/timr/repo', 'A repository', 'JavaScript');
+
+        $this->assertSame('timr', $repository->getOwner());
+    }
+
+    public function testGetName()
+    {
+        $repository = new Repository('https://github.com/timr/repo', 'A repository', 'JavaScript');
+
+        $this->assertSame('repo', $repository->getName());
     }
 }

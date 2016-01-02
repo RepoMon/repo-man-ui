@@ -62,6 +62,32 @@ class Repository
     /**
      * @return string
      */
+    public function getFullName()
+    {
+        return trim(parse_url($this->getUrl(), \PHP_URL_PATH), '/');
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwner()
+    {
+        $names = explode('/', $this->getFullName());
+        return $names[0];
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        $names = explode('/', $this->getFullName());
+        return $names[1];
+    }
+
+    /**
+     * @return string
+     */
     public function getDescription()
     {
         return $this->description;

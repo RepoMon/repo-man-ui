@@ -17,6 +17,7 @@ use Ace\RepoManUi\Provider\RabbitClientProvider;
 use Ace\RepoManUi\Provider\TokenProvider;
 use Ace\RepoManUi\Provider\LocalRepositoryServiceProvider;
 use Ace\RepoManUi\Provider\GitRepositoryServiceProvider;
+use Ace\RepoManUi\Provider\AuthenticationServiceProvider;
 
 use GuzzleHttp\Client;
 
@@ -38,12 +39,7 @@ $app->register(new RabbitClientProvider());
 $app->register(new TokenProvider());
 $app->register(new LocalRepositoryServiceProvider());
 $app->register(new GitRepositoryServiceProvider());
-
-$client = new Client([
-    'headers' => [
-        'User-Agent' => 'Repository Monitor v4.0.0'
-    ]
-]);
+$app->register(new AuthenticationServiceProvider());
 
 $require_authn = function(Request $request) use ($app) {
     if (null === $app['session']->get('user')) {
@@ -89,6 +85,7 @@ $app->post('/', function(Request $request) use ($app){
         'data' => [
             'owner' => $user['login'],
             'url' => $request->get('repository'),
+            'full_name' => $request->get('full_name'),
             'description' => $request->get('description'),
             'language' => $request->get('language'),
             'dependency_manager' => $request->get('dependency_manager'),
@@ -109,14 +106,9 @@ $app->post('/', function(Request $request) use ($app){
  */
 $app->get('/login', function(Request $request) use ($app){
 
-    $authn_host = $app['config']->getRemoteHost();
-    $client_id = $app['config']->getApiClientId();
-
-    $endpoint = sprintf("%s/login/oauth/authorize?scope=user,public_repo&client_id=%s", $authn_host, $client_id);
-
     return $app['twig']->render('login.html', [
         'authentication_service' => $app['config']->getAuthnServiceName(),
-        'endpoint' => $endpoint
+        'endpoint' => $app['authentication-service']->getAuthenticationEndPoint()
     ]);
 });
 
@@ -124,54 +116,24 @@ $app->get('/login', function(Request $request) use ($app){
  * authentication callback - client is redirected here, authentication is validated
  * get an access token and set up a cookie session
  */
-$app->get('/authn-callback', function(Request $request) use ($app, $client) {
+$app->get('/authn-callback', function(Request $request) use ($app) {
 
-    $session_code = $request->get('code');
+    $token = $app['authentication-service']->getAccessTokenFromCode($request->get('code'));
+    $user = $app['authentication-service']->getUserDataFromAccessToken($token);
 
-    $authn_host = $app['config']->getRemoteHost();
-
-    // get the access token
-    $authn_result = $client->request('POST', $authn_host . '/login/oauth/access_token', [
-        'form_params' => [
-            'client_id' => $app['config']->getApiClientId(),
-            'client_secret' => $app['config']->getApiClientSecret(),
-            'code' => $session_code,
-        ],
-        'headers' => [
-            'Accept' => 'application/json'
-        ]
-    ]);
-
-    $authn_data = json_decode($authn_result->getBody(), true);
-
-    $api_host = $app['config']->getRemoteApiHost();
-
-    // get the user details
-    $user_result = $client->request('GET', $api_host . '/user', [
-        'query' => [
-            'access_token' => $authn_data['access_token']
-        ],
-        'headers' => [
-            'Accept' => 'application/json'
-        ]
-    ]);
-
-    $user_data = json_decode($user_result->getBody(), true);
-
-    $app['session']->set('user', $user_data);
+    $app['session']->set('user', $user);
 
     $event = [
         'name' => 'repo-mon.token.added',
         'data' => [
-            'user' => $user_data['login'],
-            'token' => $authn_data['access_token']
+            'user' => $user['login'],
+            'token' => $token
         ]
     ];
 
     $app['rabbit-client']->publish($event);
 
     return $app->redirect('/');
-
 });
 
 /**

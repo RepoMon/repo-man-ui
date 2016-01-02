@@ -14,6 +14,7 @@
         {% for repo in available %}
         <li>
             <span>{{ repo.getUrl() }}</span>
+            <span>{{ repo.getFullName() }}</span>
             <span>{{ repo.getDescription() }}</span>
             <span>{{ repo.getLanguage() }}</span>
             <span>{{ repo.getDependencyManager() }}</span>
