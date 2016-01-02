@@ -104,7 +104,7 @@ class GitRepositoryServiceTest extends PHPUnit_Framework_TestCase
 
         $this->mock_http_client->expects($this->any())
             ->method('request')
-            ->with('GET', $this->git_api_host . '/user/repos/', [
+            ->with('GET', $this->git_api_host . '/user/repos', [
                 'query' => [
                     'access_token' => $this->token
                 ],

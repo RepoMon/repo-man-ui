@@ -57,7 +57,7 @@ class GitRepositoryService
 
             $response = $this->client->request(
                 'GET',
-                $this->git_api_host . '/user/repos/',
+                $this->git_api_host . '/user/repos',
                 [
                 'query' => [
                     'access_token' => $token
