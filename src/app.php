@@ -71,7 +71,7 @@ $app->get('/', function(Request $request) use ($app){
     return $app['twig']->render('index.html', [
         'configured' => $configured_repositories,
         'available' => $available_repositories,
-        'user' => $app['session']->get('user')
+        'user' => $user
     ]);
 
 })->before($require_authn);
@@ -83,6 +83,7 @@ $app->post('/', function(Request $request) use ($app){
 
     $user = $app['session']->get('user');
 
+    // calculate hour & minute to schedule task here?
     $event = [
         'name' => 'repo-mon.repo.configured',
         'data' => [
@@ -91,7 +92,7 @@ $app->post('/', function(Request $request) use ($app){
             'description' => $request->get('description'),
             'language' => $request->get('language'),
             'dependency_manager' => $request->get('dependency_manager'),
-            //'frequency' => $request->get('frequency'),
+            'frequency' => '1',
             //'hour' => $request->get('hour'),
             'timezone' => $request->get('timezone'),
         ]
