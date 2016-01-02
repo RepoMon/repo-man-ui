@@ -96,8 +96,7 @@ class GitRepositoryService
     private function extractDependencyManager($language)
     {
         switch (strtolower($language)) {
-            case 'php7':
-                'php';
+            case 'php':
                 return 'composer';
 
             case 'javascript':
