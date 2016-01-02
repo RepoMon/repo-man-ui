@@ -88,6 +88,7 @@ $app->post('/', function(Request $request) use ($app){
         'data' => [
             'owner' => $user['login'],
             'url' => $request->get('repository'),
+            'description' => $request->get('description'),
             'language' => $request->get('language'),
             'dependency_manager' => $request->get('dependency_manager'),
             //'frequency' => $request->get('frequency'),
