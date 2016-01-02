@@ -31,14 +31,8 @@ class LocalRepositoryService
     }
 
     /**
-     * Return repository data used by UI
-     * [
-     *  'url' => url of repository,
-     *  'language' => language in use
-     *  'dependency_manager' => eg composer or npm
-     *  'timezone' => 'gmt'
-     *  'active' => boolean "is configured"?
-     * ]
+     * Return array of \Ace\RepoManUi\Remote\Repository objects
+     *
      * @param string $user
      * @return array
      */
@@ -51,7 +45,15 @@ class LocalRepositoryService
                 ]
             ]);
 
-            return json_decode($response->getBody(), true);
+            $repositories = [];
+            foreach (json_decode($response->getBody(), true) as $data) {
+                $repository = new Repository($data['url'], $data['description'], $data['language']);
+                $repository->setTimezone($data['timezone']);
+                $repository->setActive($data['active']);
+                $repositories []= $repository;
+            }
+            return $repositories;
+
         } catch (TransferException $ex) {
             throw new UnavailableException($ex->getMessage());
         }

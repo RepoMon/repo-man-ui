@@ -59,19 +59,22 @@ class GitRepositoryServiceTest extends PHPUnit_Framework_TestCase
     {
         $user = 'agent-orange';
         $repos = [
-            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP7']
-        ];
-
-        $expected = [
-            ['url' => 'https://github.com/apps/service-a', 'language' => 'PHP7', 'dependency_manager' => 'composer', 'timezone' => 'GMT', 'active' => false]
+            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP', 'description' => 'A repository',]
         ];
 
         $this->whenGitRepositoriesExist($user, $repos);
 
-        $repositories = $this->repository_service->getRepositories($user, 'GMT');
+        $repositories = $this->repository_service->getRepositories($user, 'Europe/London');
 
         $this->assertInternalType('array', $repositories);
-        $this->assertEquals($expected, $repositories);
+        $repository = current($repositories);
+
+        $this->assertSame($repos[0]['html_url'], $repository->getUrl());
+        $this->assertSame($repos[0]['description'], $repository->getDescription());
+        $this->assertSame($repos[0]['language'], $repository->getLanguage());
+        $this->assertSame('composer', $repository->getDependencyManager());
+        $this->assertSame('Europe/London', $repository->getTimezone());
+        $this->assertSame(false, $repository->isActive());
     }
 
     /**

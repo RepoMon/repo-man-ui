@@ -41,7 +41,14 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
     {
         $user = 'agent-orange';
         $repos = [
-            ['url' => 'https://github.com/apps/service-a', 'language' => 'PHP7', 'dependency_manager' => 'composer', 'timezone' => 'GMT', 'active' => true]
+            [
+                'url' => 'https://github.com/apps/service-a',
+                'description' => 'A repository',
+                'language' => 'PHP',
+                'dependency_manager' => 'composer',
+                'timezone' => 'Europe/London',
+                'active' => true
+            ]
         ];
         $this->whenLocalRepositoriesExist($user, $repos);
 
@@ -49,7 +56,14 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $repositories);
 
-        $this->assertSame($repos, $repositories);
+        $repository = current($repositories);
+
+        $this->assertSame($repos[0]['url'], $repository->getUrl());
+        $this->assertSame($repos[0]['description'], $repository->getDescription());
+        $this->assertSame($repos[0]['language'], $repository->getLanguage());
+        $this->assertSame($repos[0]['dependency_manager'], $repository->getDependencyManager());
+        $this->assertSame($repos[0]['timezone'], $repository->getTimezone());
+        $this->assertSame($repos[0]['active'], $repository->isActive());
     }
 
     /**

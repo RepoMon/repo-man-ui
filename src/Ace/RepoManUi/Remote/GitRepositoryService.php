@@ -39,21 +39,14 @@ class GitRepositoryService
     }
 
     /**
-     * Return repository data used by UI from the git api host
-     * [
-     *  'url' => url of repository,
-     *  'language' => language in use
-     *  'dependency_manager' => eg composer or npm
-     *  'timezone' => 'gmt'
-     *  'active' => boolean "is configured"?
-     * ]
+     * Return array of \Ace\RepoManUi\Remote\Repository objects
+     *
      * @param string $user
      * @param string $timezone
      * @return array
      */
     public function getRepositories($user, $timezone)
     {
-
         try {
             $token = $this->token_service->getToken($user);
 
@@ -70,41 +63,19 @@ class GitRepositoryService
                 ]
             );
 
-            $result = [];
+            $repositories = [];
 
-            $repos = json_decode($response->getBody(), true);
+            foreach (json_decode($response->getBody(), true) as $data) {
 
-            foreach ($repos as $repo) {
-
-                $data = [
-                    'url' => $repo['html_url'],
-                    'language' => $repo['language'],
-                    'active' => false,
-                    'timezone' => $timezone
-                ];
-
-                $data['dependency_manager'] = $this->extractDependencyManager($data['language']);
-
-                $result []= $data;
+                $repository = new Repository($data['html_url'], $data['description'], $data['language']);
+                $repository->setTimezone($timezone);
+                $repositories []= $repository;
 
             }
-            return $result;
+            return $repositories;
 
         } catch (TransferException $ex) {
             throw new UnavailableException($ex->getMessage());
         }
-    }
-
-    private function extractDependencyManager($language)
-    {
-        switch (strtolower($language)) {
-            case 'php':
-                return 'composer';
-
-            case 'javascript':
-                return 'npm';
-        }
-
-        return '';
     }
 }
