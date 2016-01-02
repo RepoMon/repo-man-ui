@@ -54,7 +54,7 @@ $require_authn = function(Request $request) use ($app) {
 /**
  * show a list of repositories the user has access to and which ones are configured for updates
  */
-$app->get('/', function(Request $request) use ($app, $client){
+$app->get('/', function(Request $request) use ($app){
 
     $available_repositories = $app['session']->get('available_repositories');
 
@@ -62,16 +62,11 @@ $app->get('/', function(Request $request) use ($app, $client){
 
     // don't just store the repositories in the session, store them all in the "local repository service"
     if (!$available_repositories){
-
-        $available_repositories = $app['git-repository-service']->getRepositories($user['login'], 'GMT');
+        $available_repositories = $app['git-repository-service']->getRepositories($user['login'], 'Europe/London');
         $app['session']->set('available_repositories', $available_repositories);
     }
 
-    $configured_repositories = [];
-
-    if (!getenv('HIDE_REPOMAN_DATA')) {
-        $configured_repositories = $app['local-repository-service']->getRepositories($user['login']);
-    }
+    $configured_repositories = $app['local-repository-service']->getRepositories($user['login']);
 
     return $app['twig']->render('index.html', [
         'configured' => $configured_repositories,
@@ -84,7 +79,7 @@ $app->get('/', function(Request $request) use ($app, $client){
 /**
  * add a repository
  */
-$app->post('/', function(Request $request) use ($app,  $client){
+$app->post('/', function(Request $request) use ($app){
 
     $user = $app['session']->get('user');
 
@@ -124,13 +119,12 @@ $app->get('/login', function(Request $request) use ($app){
 });
 
 /**
- * authentication callback
+ * authentication callback - client is redirected here, authentication is validated
  * get an access token and set up a cookie session
  */
-$app->get('/authn-callback', function(Request $request) use ($app) {
+$app->get('/authn-callback', function(Request $request) use ($app, $client) {
 
     $session_code = $request->get('code');
-    $client = new Client();
 
     $authn_host = $app['config']->getRemoteHost();
 
@@ -177,25 +171,6 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
     return $app->redirect('/');
 
 });
-
-/**
- * show dependency report
- */
-$app->get('/report/dependency', function(Request $request) use ($app, $client){
-
-    $repo_man_host = $app['config']->getRepoManHost();
-
-    $response = $client->request('GET', $repo_man_host . '/dependencies/report', [
-        'headers' => [
-            'Accept' => 'text/html'
-        ]
-    ]);
-
-    return $app['twig']->render('dependency-report.html', [
-        'report' => $response->getBody(),
-    ]);
-
-})->before($require_authn);
 
 /**
  */

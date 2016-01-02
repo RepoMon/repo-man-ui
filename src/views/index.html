@@ -13,11 +13,12 @@
     <ul id="repositories">
         {% for repo in available %}
         <li>
-            <span>{{ repo.url }}</span>
-            <span>{{ repo.language }}</span>
-            <span>{{ repo.dependency_manager }}</span>
-            <span>{{ repo.timezone }}</span>
-            <span>{{ repo.active }}</span>
+            <span>{{ repo.getUrl() }}</span>
+            <span>{{ repo.getDescription() }}</span>
+            <span>{{ repo.getLanguage() }}</span>
+            <span>{{ repo.getDependencyManager() }}</span>
+            <span>{{ repo.getTimezone() }}</span>
+            <span>{{ repo.isActive() }}</span>
         </li>
         {% endfor %}
     </ul>
