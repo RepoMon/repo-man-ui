@@ -23,7 +23,6 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        #$this->givenAMockTokenService();
         $this->givenAMockHttpClient();
         $this->givenARepositoryService();
     }
@@ -83,13 +82,6 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
                     'Accept' => 'application/json'
                 ]])
             ->will($this->returnValue($mock_response));
-    }
-
-    private function givenAMockTokenService()
-    {
-        $this->mock_token_service = $this->getMockBuilder('Ace\RepoManUi\Remote\TokenService')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
     private function givenAMockHttpClient()

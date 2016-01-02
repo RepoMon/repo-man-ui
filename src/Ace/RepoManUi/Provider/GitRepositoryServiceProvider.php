@@ -1,6 +1,6 @@
 <?php namespace Ace\RepoManUi\Provider;
 
-use Ace\RepoManUi\Remote\LocalRepositoryService;
+use Ace\RepoManUi\Remote\GitRepositoryService;
 use Silex\ServiceProviderInterface;
 use Silex\Application;
 use GuzzleHttp\Client;
@@ -9,7 +9,7 @@ use GuzzleHttp\Client;
  * @author timrodger
  * Date: 30/12/15
  */
-class LocalRepositoryServiceProvider implements ServiceProviderInterface
+class GitRepositoryServiceProvider implements ServiceProviderInterface
 {
 
     public function register(Application $app)
@@ -24,8 +24,9 @@ class LocalRepositoryServiceProvider implements ServiceProviderInterface
             ]
         ]);
 
-        $app['local-repository-service'] = new LocalRepositoryService(
-            $app['config']->getRepoManHost(),
+        $app['git-repository-service'] = new GitRepositoryService(
+            $app['config']->getRemoteApiHost(),
+            $app['token-service'],
             $client
         );
     }

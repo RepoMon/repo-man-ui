@@ -16,6 +16,7 @@ use Ace\RepoManUi\Provider\ConfigProvider;
 use Ace\RepoManUi\Provider\RabbitClientProvider;
 use Ace\RepoManUi\Provider\TokenProvider;
 use Ace\RepoManUi\Provider\LocalRepositoryServiceProvider;
+use Ace\RepoManUi\Provider\GitRepositoryServiceProvider;
 
 use GuzzleHttp\Client;
 
@@ -36,6 +37,7 @@ $app->register(new ConfigProvider());
 $app->register(new RabbitClientProvider());
 $app->register(new TokenProvider());
 $app->register(new LocalRepositoryServiceProvider());
+$app->register(new GitRepositoryServiceProvider());
 
 $client = new Client([
     'headers' => [
@@ -91,14 +93,17 @@ $app->get('/', function(Request $request) use ($app, $client){
     $configured_repositories = [];
 
     if (!getenv('HIDE_REPOMAN_DATA')) {
-        $repo_man_host = $app['config']->getRepoManHost();
-        $configured_response = $client->request('GET', $repo_man_host . '/repositories/' . $user['login'], [
-            'headers' => [
-                'Accept' => 'application/json'
-            ]
-        ]);
 
-        $configured_repositories = json_decode($configured_response->getBody(), true);
+        $configured_repositories = $app['local-repository-service']->getRepositories($user['login']);
+//
+//        $repo_man_host = $app['config']->getRepoManHost();
+//        $configured_response = $client->request('GET', $repo_man_host . '/repositories/' . $user['login'], [
+//            'headers' => [
+//                'Accept' => 'application/json'
+//            ]
+//        ]);
+//
+//        $configured_repositories = json_decode($configured_response->getBody(), true);
     }
 
 

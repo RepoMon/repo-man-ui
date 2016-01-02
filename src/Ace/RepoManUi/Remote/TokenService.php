@@ -1,6 +1,7 @@
 <?php namespace Ace\RepoManUi\Remote;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * @author timrodger
@@ -34,18 +35,23 @@ class TokenService
      */
     public function getToken($name)
     {
-        $client = new Client([
-            'headers' => [
-                'User-Agent' => $this->service_name
-            ]
-        ]);
+        try {
+            $client = new Client([
+                'headers' => [
+                    'User-Agent' => $this->service_name
+                ]
+            ]);
 
-        // trim any white space from the response body
-        $endpoint = sprintf('%s/tokens/%s', $this->token_service, $name);
+            // trim any white space from the response body
+            $endpoint = sprintf('%s/tokens/%s', $this->token_service, $name);
 
-        return trim(
-            $client->request('GET', $endpoint)->getBoody()
-        );
+            return trim(
+                $client->request('GET', $endpoint)->getBoody()
+            );
+
+        } catch (TransferException $ex) {
+            throw new UnavailableException($ex->getMessage());
+        }
 
     }
 }
