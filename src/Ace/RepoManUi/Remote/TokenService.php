@@ -46,7 +46,7 @@ class TokenService
             $endpoint = sprintf('%s/tokens/%s', $this->token_service, $name);
 
             return trim(
-                $client->request('GET', $endpoint)->getBoody()
+                $client->request('GET', $endpoint)->getBody()
             );
 
         } catch (TransferException $ex) {
