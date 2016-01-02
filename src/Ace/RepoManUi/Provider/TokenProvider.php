@@ -1,6 +1,6 @@
 <?php namespace Ace\RepoManUi\Provider;
 
-use Ace\RepoMan\Remote\TokenService;
+use Ace\RepoManUi\Remote\TokenService;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
