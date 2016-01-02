@@ -4,6 +4,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 
 /**
+ * Handles access to git repositories from a GitHub service
+ *
  * @author timrodger
  * Date: 30/12/15
  */
