@@ -81,7 +81,7 @@ $app->post('/', function(Request $request) use ($app){
 
     // calculate hour & minute to schedule task here?
     $event = [
-        'name' => 'repo-mon.repo.configured',
+        'name' => 'repo-mon.repo.activated',
         'data' => [
             'owner' => $user['login'],
             'url' => $request->get('repository'),
