@@ -31,7 +31,7 @@ class GitRepositoryService
      * @param TokenService $token_service
      * @param Client $client
      */
-    public function __construct($git_api_host, TokenService $token_service, Client $client)
+    public function __construct(string $git_api_host, TokenService $token_service, Client $client)
     {
         $this->git_api_host = $git_api_host;
         $this->token_service = $token_service;
@@ -40,12 +40,12 @@ class GitRepositoryService
 
     /**
      * Return array of \Ace\RepoManUi\Remote\Repository objects
-     *
      * @param string $user
      * @param string $timezone
      * @return array
+     * @throws UnavailableException
      */
-    public function getRepositories($user, $timezone)
+    public function getRepositories(string $user, string $timezone) : array
     {
         try {
             $token = $this->token_service->getToken($user);

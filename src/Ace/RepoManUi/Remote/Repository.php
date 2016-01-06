@@ -122,7 +122,7 @@ class Repository
     /**
      * @return string
      */
-    public function getTimezone() : string 
+    public function getTimezone() : string
     {
         return $this->timezone;
     }
