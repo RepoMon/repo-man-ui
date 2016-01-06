@@ -72,7 +72,7 @@ class Repository
     /**
      * @return string
      */
-    public function getOwner()
+    public function getOwner() : string
     {
         $names = explode('/', $this->getFullName());
         return $names[0];
@@ -81,7 +81,7 @@ class Repository
     /**
      * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         $names = explode('/', $this->getFullName());
         return $names[1];
@@ -90,7 +90,7 @@ class Repository
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription() : string
     {
         return $this->description;
     }
@@ -98,7 +98,7 @@ class Repository
     /**
      * @return string
      */
-    public function getLanguage()
+    public function getLanguage() : string
     {
         return $this->language;
     }
@@ -106,7 +106,7 @@ class Repository
     /**
      * @return string
      */
-    public function getDependencyManager()
+    public function getDependencyManager() : string
     {
         return $this->dependency_manager;
     }
@@ -122,7 +122,7 @@ class Repository
     /**
      * @return string
      */
-    public function getTimezone()
+    public function getTimezone() : string 
     {
         return $this->timezone;
     }
