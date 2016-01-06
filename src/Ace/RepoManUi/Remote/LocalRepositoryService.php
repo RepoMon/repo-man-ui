@@ -21,10 +21,10 @@ class LocalRepositoryService
     private $client;
 
     /**
-     * @param $repo_man_host
+     * @param string $repo_man_host
      * @param Client $client
      */
-    public function __construct($repo_man_host, Client $client)
+    public function __construct(string $repo_man_host, Client $client)
     {
         $this->repo_man_host = $repo_man_host;
         $this->client = $client;
@@ -36,7 +36,7 @@ class LocalRepositoryService
      * @param string $user
      * @return array
      */
-    public function getRepositories($user)
+    public function getRepositories(string $user) : array
     {
         try {
             $response = $this->client->request('GET', $this->repo_man_host . '/repositories/' . $user, [

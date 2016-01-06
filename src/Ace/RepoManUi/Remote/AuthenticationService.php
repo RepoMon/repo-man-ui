@@ -34,13 +34,13 @@ class AuthenticationService
     private $client;
 
     /**
-     * @param $authn_host
-     * @param $api_host
-     * @param $client_id
-     * @param $client_secret
+     * @param string $authn_host
+     * @param string $api_host
+     * @param string $client_id
+     * @param string $client_secret
      * @param Client $client
      */
-    public function __construct($authn_host, $api_host, $client_id, $client_secret, Client $client)
+    public function __construct(string $authn_host, string $api_host, string $client_id, string $client_secret, Client $client)
     {
         $this->authn_host = $authn_host;
         $this->api_host = $api_host;
@@ -52,17 +52,17 @@ class AuthenticationService
     /**
      * @return string
      */
-    public function getAuthenticationEndPoint()
+    public function getAuthenticationEndPoint() : string
     {
         return sprintf("%s/login/oauth/authorize?scope=user,public_repo&client_id=%s", $this->authn_host, $this->client_id);
     }
 
     /**
      * Verifies that the code is valid, ie. that the user has authenticated
-     * @param $code
+     * @param string $code
      * @return string
      */
-    public function getAccessTokenFromCode($code)
+    public function getAccessTokenFromCode(string $code) : string
     {
         // get the access token
         $response = $this->client->request('POST', $this->authn_host . '/login/oauth/access_token', [
@@ -82,11 +82,10 @@ class AuthenticationService
 
     /**
      * Retrieve the account data from the access token provided
-     *
-     * @param $token
+     * @param string $token
      * @return array
      */
-    public function getUserDataFromAccessToken($token)
+    public function getUserDataFromAccessToken(string $token) : array
     {
         $response = $this->client->request('GET', $this->api_host . '/user', [
             'query' => [

@@ -2,7 +2,7 @@
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-use PhpAmqpLib\Channel\AMQPChannel;;
+use PhpAmqpLib\Channel\AMQPChannel;
 
 /**
  * @author timrodger
@@ -36,20 +36,17 @@ class RabbitClient
     private $channel;
 
     /**
-     * @param $host
-     * @param $port
-     * @param $channel_name
+     * @param string $host
+     * @param string $port
+     * @param string $channel_name
      */
-    public function __construct($host, $port, $channel_name)
+    public function __construct(string $host, string $port, string $channel_name)
     {
         $this->host = $host;
         $this->port = $port;
         $this->channel_name = $channel_name;
     }
 
-    /**
-     *
-     */
     private function connect()
     {
         if (!$this->connection) {
@@ -59,9 +56,6 @@ class RabbitClient
         }
     }
 
-    /**
-     *
-     */
     public function __destruct()
     {
         if ($this->connection) {
