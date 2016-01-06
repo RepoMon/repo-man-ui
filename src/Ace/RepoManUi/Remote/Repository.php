@@ -1,4 +1,6 @@
-<?php namespace Ace\RepoManUi\Remote;
+<?php
+declare(strict_types=1);
+namespace Ace\RepoManUi\Remote;
 
 /**
  * Represents a git repository
@@ -43,7 +45,7 @@ class Repository
      * @param string $description
      * @param string $language
      */
-    public function __construct($url, $description, $language)
+    public function __construct(string $url, string $description, string $language)
     {
         $this->url = $url;
         $this->description = $description;
@@ -54,7 +56,7 @@ class Repository
     /**
      * @return string
      */
-    public function getUrl()
+    public function getUrl() : string
     {
         return $this->url;
     }
@@ -62,7 +64,7 @@ class Repository
     /**
      * @return string
      */
-    public function getFullName()
+    public function getFullName() : string
     {
         return trim(parse_url($this->getUrl(), \PHP_URL_PATH), '/');
     }
@@ -112,7 +114,7 @@ class Repository
     /**
      * @return boolean
      */
-    public function isActive()
+    public function isActive() : bool
     {
         return $this->active;
     }
@@ -128,7 +130,7 @@ class Repository
     /**
      * @param boolean $active
      */
-    public function setActive($active)
+    public function setActive(bool $active)
     {
         $this->active = $active;
     }
@@ -136,7 +138,7 @@ class Repository
     /**
      * @param string $timezone
      */
-    public function setTimezone($timezone)
+    public function setTimezone(string $timezone)
     {
         $this->timezone = $timezone;
     }
@@ -144,7 +146,7 @@ class Repository
     /**
      * @param string $language
      */
-    private function extractDependencyManager($language)
+    private function extractDependencyManager(string $language)
     {
         switch (strtolower($language)) {
             case 'php':

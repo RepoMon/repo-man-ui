@@ -1,4 +1,6 @@
-<?php namespace Ace\RepoManUi\Remote;
+<?php
+declare(strict_types=1);
+namespace Ace\RepoManUi\Remote;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
@@ -30,10 +32,11 @@ class TokenService
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return string
+     * @throws UnavailableException
      */
-    public function getToken($name)
+    public function getToken(string $name) : string
     {
         try {
             $client = new Client([
