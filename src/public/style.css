@@ -2,6 +2,10 @@
     font-family: "Helvetica";
 }
 
+.repository-list {
+    font-size: 12pt;
+}
+
 #footer {
     font-size: x-small;
 }

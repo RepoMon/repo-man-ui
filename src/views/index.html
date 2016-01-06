@@ -13,13 +13,9 @@
     <ul id="repositories">
         {% for repo in available %}
         <li>
-            <span>{{ repo.getUrl() }}</span>
             <span>{{ repo.getFullName() }}</span>
             <span>{{ repo.getDescription() }}</span>
-            <span>{{ repo.getLanguage() }}</span>
-            <span>{{ repo.getDependencyManager() }}</span>
-            <span>{{ repo.getTimezone() }}</span>
-            <span>{{ repo.isActive() }}</span>
+            <span><input id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked {% endif %}></span>
         </li>
         {% endfor %}
     </ul>
