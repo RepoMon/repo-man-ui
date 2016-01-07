@@ -95,23 +95,25 @@ $app->post('/refresh', function(Request $request) use ($app) {
 
     $local_repositories = $app['local-repository-service']->getRepositories($user['login']);
 
-    foreach($repositories as $repository) {
-        // post an added event, if not already locally available
-        
-        $event = [
-            'name' => 'repo-mon.repository.added',
-            'data' => [
-                'url' => $repository->getUrl(),
-                'full_name' => $repository->getFullName(),
-                'description' => $repository->getDescription(),
-                'language' => $repository->getLanguage(),
-                'owner' => $user['login'],
-                'dependency_manager' => $repository->getDependencyManager(),
-                'timezone' => $timezone,
-            ]
-        ];
+    foreach($repositories as $full_name => $repository) {
 
-        $app['rabbit-client']->publish($event);
+        // post an added event, if not already locally available
+        if (!isset($local_repositories[$full_name])) {
+            $event = [
+                'name' => 'repo-mon.repository.added',
+                'data' => [
+                    'url' => $repository->getUrl(),
+                    'full_name' => $repository->getFullName(),
+                    'description' => $repository->getDescription(),
+                    'language' => $repository->getLanguage(),
+                    'owner' => $user['login'],
+                    'dependency_manager' => $repository->getDependencyManager(),
+                    'timezone' => $timezone,
+                ]
+            ];
+
+            $app['rabbit-client']->publish($event);
+        }
     }
 
     return $app->redirect('/');

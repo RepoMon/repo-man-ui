@@ -18,7 +18,7 @@
         <li>
             <span>{{ repo.getFullName() }}</span>
             <span>{{ repo.getDescription() }}</span>
-            <span><input id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked {% endif %}></span>
+            <span><input class="repo_select" id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked {% endif %}></span>
         </li>
         {% endfor %}
     </ul>

@@ -69,7 +69,7 @@ class GitRepositoryService
 
                 $repository = new Repository($data['html_url'], $data['description'], $data['language']);
                 $repository->setTimezone($timezone);
-                $repositories []= $repository;
+                $repositories [$repository->getFullName()]= $repository;
 
             }
             return $repositories;

@@ -50,7 +50,7 @@ class LocalRepositoryService
                 $repository = new Repository($data['url'], $data['description'], $data['language']);
                 $repository->setTimezone($data['timezone']);
                 $repository->setActive($data['active']);
-                $repositories []= $repository;
+                $repositories [$repository->getFullName()]= $repository;
             }
             return $repositories;
 
