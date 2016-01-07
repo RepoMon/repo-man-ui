@@ -41,6 +41,10 @@ $app->register(new LocalRepositoryServiceProvider());
 $app->register(new GitRepositoryServiceProvider());
 $app->register(new AuthenticationServiceProvider());
 
+/**
+ * @param Request $request
+ * @return \Symfony\Component\HttpFoundation\RedirectResponse
+ */
 $require_authn = function(Request $request) use ($app) {
     if (null === $app['session']->get('user')) {
         return $app->redirect('/login');
@@ -48,49 +52,89 @@ $require_authn = function(Request $request) use ($app) {
 };
 
 /**
- * show a list of repositories the user has access to and which ones are configured for updates
+ * show a list of repositories for the user
  */
 $app->get('/', function(Request $request) use ($app){
 
-    $available_repositories = $app['session']->get('available_repositories');
-
     $user = $app['session']->get('user');
 
-    // don't just store the repositories in the session, store them all in the "local repository service"
-    if (!$available_repositories){
-        $available_repositories = $app['git-repository-service']->getRepositories($user['login'], 'Europe/London');
-        $app['session']->set('available_repositories', $available_repositories);
-    }
-
-    $configured_repositories = $app['local-repository-service']->getRepositories($user['login']);
+    $repositories = $app['local-repository-service']->getRepositories($user['login']);
 
     return $app['twig']->render('index.html', [
-        'configured' => $configured_repositories,
-        'available' => $available_repositories,
+        'repositories' => $repositories,
         'user' => $user
     ]);
 
 })->before($require_authn);
 
+
 /**
- * add a repository
+ * Respond with a list of repositories in json
  */
-$app->post('/', function(Request $request) use ($app){
+$app->get('/repositories', function(Request $request) use ($app) {
 
     $user = $app['session']->get('user');
 
+    $repositories = $app['local-repository-service']->getRepositories($user['login']);
+
+    return $app->json(
+        $repositories
+    );
+
+})->before($require_authn);
+
+/**
+ * update local repositories with the ones the user has access to on remote git host
+ */
+$app->post('/refresh', function(Request $request) use ($app) {
+
+    $user = $app['session']->get('user');
+    $timezone = $request->get('timezone');
+
+    $repositories = $app['git-repository-service']->getRepositories($user['login'], $timezone);
+
+    $local_repositories = $app['local-repository-service']->getRepositories($user['login']);
+
+    foreach($repositories as $repository) {
+        // post an added event, if not already locally available
+        
+        $event = [
+            'name' => 'repo-mon.repository.added',
+            'data' => [
+                'url' => $repository->getUrl(),
+                'full_name' => $repository->getFullName(),
+                'description' => $repository->getDescription(),
+                'language' => $repository->getLanguage(),
+                'owner' => $user['login'],
+                'dependency_manager' => $repository->getDependencyManager(),
+                'timezone' => $timezone,
+            ]
+        ];
+
+        $app['rabbit-client']->publish($event);
+    }
+
+    return $app->redirect('/');
+
+})->before($require_authn);
+
+
+/**
+ * Activate / deactivate a repository
+ */
+$app->post('/repositories/{name}', function(Request $request, $name) use ($app){
+
+    if ($request->get('active')) {
+        $event = 'repo-mon.repo.activated';
+    } else {
+        $event = 'repo-mon.repo.deactivated';
+    }
+
     // calculate hour & minute to schedule task here?
     $event = [
-        'name' => 'repo-mon.repo.activated',
+        'name' => $event,
         'data' => [
-            'owner' => $user['login'],
-            'url' => $request->get('repository'),
-            'full_name' => $request->get('full_name'),
-            'description' => $request->get('description'),
-            'language' => $request->get('language'),
-            'dependency_manager' => $request->get('dependency_manager'),
-            'frequency' => '1',
-            //'hour' => $request->get('hour'),
+            'full_name' => $name,
             'timezone' => $request->get('timezone'),
         ]
     ];
@@ -99,7 +143,7 @@ $app->post('/', function(Request $request) use ($app){
 
     return $app->redirect('/');
 
-})->before($require_authn);
+})->assert('repository', '.+')->before($require_authn);
 
 /**
  * show user link to authenticate

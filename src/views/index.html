@@ -6,12 +6,15 @@
 <div>
 {{ user.name }}
     <h1>Repositories</h1>
+    <form action="/refresh" method="POST">
+        <input type="submit" name="refresh" value="Refresh">
+    </form>
 </div>
 
 <div class="repository-list">
 
     <ul id="repositories">
-        {% for repo in available %}
+        {% for repo in repositories %}
         <li>
             <span>{{ repo.getFullName() }}</span>
             <span>{{ repo.getDescription() }}</span>
