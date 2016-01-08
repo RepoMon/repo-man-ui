@@ -47,9 +47,9 @@ class LocalRepositoryService
 
             $repositories = [];
             foreach (json_decode($response->getBody(), true) as $data) {
-                $repository = new Repository($data['url'], $data['description'], $data['language']);
+                $repository = new Repository($data['url'], $data['description'], $data['lang']);
                 $repository->setTimezone($data['timezone']);
-                $repository->setActive($data['active']);
+                $repository->setActive($data['active'] == '1');
                 $repositories [$repository->getFullName()]= $repository;
             }
             return $repositories;

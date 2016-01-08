@@ -13,7 +13,7 @@
       "monolog/monolog": "~1.15",
       "twig/twig": "~1.23",
       "guzzlehttp/guzzle": "^6.1",
-      "videlalvaro/php-amqplib": "2.5.*"
+      "videlalvaro/php-amqplib": "2.6.*"
     },
 
     "require-dev": {
