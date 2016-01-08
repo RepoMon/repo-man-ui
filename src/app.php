@@ -89,7 +89,7 @@ $app->get('/repositories', function(Request $request) use ($app) {
 $app->post('/refresh', function(Request $request) use ($app) {
 
     $user = $app['session']->get('user');
-    $timezone = $request->get('timezone');
+    $timezone = $request->get('timezone', 'Europe/London');
 
     $repositories = $app['git-repository-service']->getRepositories($user['login'], $timezone);
 
