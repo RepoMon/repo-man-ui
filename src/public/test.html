@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="js/jquery-2.1.4.min.js"></script>
+
+
+    <script type="text/javascript">
+
+        // attach handler when clicking the select_repo checkboxes
+        $(document).ready(function() {
+            $(".select_repo").each(function(index){
+                $(this).click(function() {
+                    // post to server here
+                    console.log("checkbox " + this.id + ' ' + this.checked);
+
+
+                    $.ajax({
+                        url: "/repositories/" + this.id,
+                        data: {active : this.checked },
+                        method: 'POST'
+                    }).done(function(data) {
+                        console.log('Success ' + JSON.stringify(data));
+                    }).fail(function(data) {
+                        console.log('Error ' + JSON.stringify(data));
+                    });
+                });
+            });
+
+        });
+    </script>
+
+
+</head>
+
+<body>
+
+
+<div class="repository-list">
+
+    <ul id="repositories">
+        <li class="repo_item">
+            <span>test/repo</span>
+            <span>Description</span>
+            <span><input class="select_repo" id="text/repo" type="checkbox"/></span>
+        </li>
+    </ul>
+
+</div>
+
+</body>
+</html>

@@ -19,7 +19,7 @@
         <li>
             <span>{{ repo.getFullName() }}</span>
             <span>{{ repo.getDescription() }}</span>
-            <span><input class="repo_select" id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked {% endif %}></span>
+            <span><input class="select_repo" id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked {% endif %}></span>
         </li>
         {% endfor %}
     </ul>
@@ -27,3 +27,27 @@
 </div>
 
 {% endblock %}
+
+<script type="text/javascript">
+
+    // attach handler when clicking the select_repo checkboxes
+    $(document).ready(function() {
+        $(".select_repo").each(function(index){
+            $(this).click(function() {
+                // post to server here
+                console.log("checkbox " + index + ' ' + this.checked);
+
+                $.ajax({
+                    url: "/repositories/" + this.id,
+                    data: {active : this.checked },
+                    method: 'POST'
+                }).done(function(data) {
+                    console.log('Success ' + JSON.stringify(data));
+                }).fail(function(data) {
+                    console.log('Error ' + JSON.stringify(data));
+                });
+            });
+        });
+
+    });
+</script>

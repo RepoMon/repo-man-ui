@@ -143,7 +143,7 @@ $app->post('/repositories/{name}', function(Request $request, $name) use ($app){
 
     $app['rabbit-client']->publish($event);
 
-    return $app->redirect('/');
+    return $app->json($event);
 
 })->assert('repository', '.+')->before($require_authn);
 
