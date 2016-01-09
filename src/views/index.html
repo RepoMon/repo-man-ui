@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Repository management{% endblock %}
 
 {% block content %}
 <div>
@@ -25,17 +25,16 @@
     </ul>
 
 </div>
-
 {% endblock %}
 
+
+{% block bodyjs %}
 <script type="text/javascript">
 
     // attach handler when clicking the select_repo checkboxes
     $(document).ready(function() {
         $(".select_repo").each(function(index){
             $(this).click(function() {
-
-                //var jstz = require('jstimezonedetect');
 
                 // post to server here
                 console.log("checkbox " + index + ' ' + this.checked);
@@ -57,3 +56,4 @@
 
     });
 </script>
+{% endblock %}

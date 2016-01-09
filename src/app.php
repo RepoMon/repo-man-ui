@@ -127,9 +127,9 @@ $app->post('/refresh', function(Request $request) use ($app) {
 $app->post('/repositories/{name}', function(Request $request, $name) use ($app){
 
     if ($request->get('active')) {
-        $event = 'repo-mon.repo.activated';
+        $event = 'repo-mon.repository.activated';
     } else {
-        $event = 'repo-mon.repo.deactivated';
+        $event = 'repo-mon.repository.deactivated';
     }
 
     // calculate hour & minute to schedule task here?
@@ -145,7 +145,7 @@ $app->post('/repositories/{name}', function(Request $request, $name) use ($app){
 
     return $app->json($event);
 
-})->assert('repository', '.+')->before($require_authn);
+})->assert('name', '.+')->before($require_authn);
 
 /**
  * show user link to authenticate
