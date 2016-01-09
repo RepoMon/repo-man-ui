@@ -77,6 +77,41 @@ class GitRepositoryServiceTest extends PHPUnit_Framework_TestCase
         $this->assertSame(false, $repository->isActive());
     }
 
+    public function testGetRepositoriesHandlesRepositoriesWithoutLanguages()
+    {
+        $user = 'agent-orange';
+        $repos = [
+            ['html_url' => 'https://github.com/apps/service-a', 'language' => null, 'description' => 'A repository',]
+        ];
+
+        $this->whenGitRepositoriesExist($user, $repos);
+
+        $repositories = $this->repository_service->getRepositories($user, 'Europe/London');
+
+        $this->assertInternalType('array', $repositories);
+        $repository = current($repositories);
+
+        $this->assertSame('', $repository->getLanguage());
+        $this->assertSame('', $repository->getDependencyManager());
+    }
+
+    public function testGetRepositoriesHandlesRepositoriesWithoutADescription()
+    {
+        $user = 'agent-orange';
+        $repos = [
+            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP', 'description' => null,]
+        ];
+
+        $this->whenGitRepositoriesExist($user, $repos);
+
+        $repositories = $this->repository_service->getRepositories($user, 'Europe/London');
+
+        $this->assertInternalType('array', $repositories);
+        $repository = current($repositories);
+
+        $this->assertSame('', $repository->getDescription());
+    }
+
     /**
      * @expectedException Ace\RepoManUi\Remote\UnavailableException
      */

@@ -67,7 +67,9 @@ class GitRepositoryService
 
             foreach (json_decode($response->getBody(), true) as $data) {
 
-                $repository = new Repository($data['html_url'], $data['description'], $data['language']);
+                $description = $data['description'] ? : '';
+                $language = $data['language'] ? : '';
+                $repository = new Repository($data['html_url'], $description, $language);
                 $repository->setTimezone($timezone);
                 $repositories [$repository->getFullName()]= $repository;
 
