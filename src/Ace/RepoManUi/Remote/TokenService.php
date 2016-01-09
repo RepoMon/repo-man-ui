@@ -17,18 +17,19 @@ class TokenService
     private $token_service;
 
     /**
-     * @var string
+     * @var Client
      */
-    private $service_name;
+    private $client;
 
     /**
-     * @param $token_service string
-     * @param $service_name string
+     * TokenService constructor.
+     * @param $token_service
+     * @param Client $client
      */
-    public function __construct($token_service, $service_name)
+    public function __construct(string $token_service, Client $client)
     {
         $this->token_service = $token_service;
-        $this->service_name = $service_name;
+        $this->client = $client;
     }
 
     /**
@@ -39,17 +40,14 @@ class TokenService
     public function getToken(string $name) : string
     {
         try {
-            $client = new Client([
-                'headers' => [
-                    'User-Agent' => $this->service_name
-                ]
-            ]);
 
             // trim any white space from the response body
-            $endpoint = sprintf('%s/tokens/%s', $this->token_service, $name);
-
             return trim(
-                $client->request('GET', $endpoint)->getBody()->__toString()
+                $this->client->request(
+                    'GET',
+                    sprintf('%s/tokens/%s', $this->token_service, $name)
+                )->getBody()
+                    ->__toString()
             );
 
         } catch (TransferException $ex) {

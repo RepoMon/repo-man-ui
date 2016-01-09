@@ -1,6 +1,7 @@
 <?php namespace Ace\RepoManUi\Provider;
 
 use Ace\RepoManUi\Remote\TokenService;
+use GuzzleHttp\Client;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -18,9 +19,16 @@ class TokenProvider implements ServiceProviderInterface
 
     public function boot(Application $app)
     {
+        $client = new Client([
+            'headers' => [
+                'User-Agent' => $app['config']->getServiceName()
+            ]
+        ]);
+
+
         $app['token-service'] = new TokenService(
             $app['config']->getTokenService(),
-            $app['config']->getServiceName()
+            $client
         );
     }
 }
