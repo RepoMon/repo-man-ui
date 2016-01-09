@@ -1,4 +1,6 @@
-<?php namespace Ace\RepoManUi\Provider;
+<?php
+declare(strict_types=1);
+namespace Ace\RepoManUi\Provider;
 
 use Ace\RepoManUi\Remote\AuthenticationService;
 use Silex\Application;

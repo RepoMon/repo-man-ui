@@ -1,4 +1,6 @@
-<?php namespace Ace\RepoManUi\Remote;
+<?php
+declare(strict_types=1);
+namespace Ace\RepoManUi\Remote;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;

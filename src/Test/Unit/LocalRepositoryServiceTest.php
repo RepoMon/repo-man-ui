@@ -44,7 +44,7 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
             [
                 'url' => 'https://github.com/apps/service-a',
                 'description' => 'A repository',
-                'language' => 'PHP',
+                'lang' => 'PHP',
                 'dependency_manager' => 'composer',
                 'timezone' => 'Europe/London',
                 'active' => true
@@ -60,7 +60,7 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($repos[0]['url'], $repository->getUrl());
         $this->assertSame($repos[0]['description'], $repository->getDescription());
-        $this->assertSame($repos[0]['language'], $repository->getLanguage());
+        $this->assertSame($repos[0]['lang'], $repository->getLanguage());
         $this->assertSame($repos[0]['dependency_manager'], $repository->getDependencyManager());
         $this->assertSame($repos[0]['timezone'], $repository->getTimezone());
         $this->assertSame($repos[0]['active'], $repository->isActive());
