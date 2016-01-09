@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="style.css" />
 
     <script src="js/jquery-2.1.4.min.js"></script>
-
+    <script src="/js/jstz.js"></script>
 
     <script type="text/javascript">
 
@@ -18,7 +18,10 @@
 
                     $.ajax({
                         url: "/repositories/" + this.id,
-                        data: {active : this.checked },
+                        data: {
+                            active : this.checked,
+                            timezone: jstz.determine().name()
+                        },
                         method: 'POST'
                     }).done(function(data) {
                         console.log('Success ' + JSON.stringify(data));

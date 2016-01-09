@@ -34,12 +34,18 @@
     $(document).ready(function() {
         $(".select_repo").each(function(index){
             $(this).click(function() {
+
+                //var jstz = require('jstimezonedetect');
+
                 // post to server here
                 console.log("checkbox " + index + ' ' + this.checked);
 
                 $.ajax({
                     url: "/repositories/" + this.id,
-                    data: {active : this.checked },
+                    data: {
+                        active : this.checked,
+                        timezone: jstz.determine().name()
+                    },
                     method: 'POST'
                 }).done(function(data) {
                     console.log('Success ' + JSON.stringify(data));
