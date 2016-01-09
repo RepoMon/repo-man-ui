@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 namespace Ace\RepoManUi\Remote;
 
 use GuzzleHttp\Client;
@@ -47,7 +46,6 @@ class TokenService
                     'GET',
                     sprintf('%s/tokens/%s', $this->token_service, $name)
                 )->getBody()
-                    ->__toString()
             );
 
         } catch (TransferException $ex) {

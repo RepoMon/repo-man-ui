@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 namespace Ace\RepoManUi\Remote;
 
 use GuzzleHttp\Client;
