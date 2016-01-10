@@ -16,9 +16,9 @@
 
     <ul id="repositories">
         {% for repo in repositories %}
-        <li>
-            <span>{{ repo.getFullName() }}</span>
-            <span>{{ repo.getDescription() }}</span>
+        <li class="repository {% if repo.isActive() %}repository-active{% endif %}">
+            <span class="repository-name">{{ repo.getFullName() }}</span>
+            <span class="repository-description">{{ repo.getDescription() }}</span>
             <span><input class="select_repo" id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked{% endif %} {% if repo.getLanguage() != 'PHP' %} disabled{% endif %}></span>
         </li>
         {% endfor %}
@@ -34,11 +34,16 @@
     // attach handler when clicking the select_repo checkboxes
     $(document).ready(function() {
         $(".select_repo").each(function(index){
+
             $(this).click(function() {
 
-                // post to server here
-                console.log("checkbox " + index + ' ' + this.checked);
+                if (this.checked) {
+                    $(this).parent().css({'class': 'repository-active'});
+                } else {
+                    $(this).parent().css({'class': ''});
+                }
 
+                // post change
                 $.ajax({
                     url: "/repositories/" + this.id,
                     data: {
@@ -47,9 +52,9 @@
                     },
                     method: 'POST'
                 }).done(function(data) {
-                    console.log('Success ' + JSON.stringify(data));
+                    console.debug(JSON.stringify(data));
                 }).fail(function(data) {
-                    console.log('Error ' + JSON.stringify(data));
+                    console.error('Error ' + JSON.stringify(data));
                 });
             });
         });
