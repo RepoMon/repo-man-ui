@@ -126,7 +126,7 @@ $app->post('/refresh', function(Request $request) use ($app) {
  */
 $app->post('/repositories/{name}', function(Request $request, $name) use ($app){
 
-    if ($request->get('active')) {
+    if ('true' === $request->get('active', '')) {
         $event = 'repo-mon.repository.activated';
     } else {
         $event = 'repo-mon.repository.deactivated';
