@@ -15,9 +15,9 @@ class Configuration
     /**
      * @return string
      */
-    public function getRepoManHost()
+    public function getRepositoryHost()
     {
-        return 'http://repoman';
+        return 'http://repository';
     }
 
     /**

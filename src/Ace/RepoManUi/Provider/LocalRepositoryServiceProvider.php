@@ -25,7 +25,7 @@ class LocalRepositoryServiceProvider implements ServiceProviderInterface
         ]);
 
         $app['local-repository-service'] = new LocalRepositoryService(
-            $app['config']->getRepoManHost(),
+            $app['config']->getRepositoryHost(),
             $client
         );
     }
