@@ -23,9 +23,6 @@ CMD ["php", "-S", "0.0.0.0:80"]
 # Move application files into place
 COPY src/ /home/app/
 
-# remove any development cruft
-RUN rm -rf /home/app/vendor/*
-
 WORKDIR /home/app
 
 # Install dependencies
