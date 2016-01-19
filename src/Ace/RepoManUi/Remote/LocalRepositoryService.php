@@ -40,7 +40,7 @@ class LocalRepositoryService
     public function getRepositories(string $user) : array
     {
         try {
-            $response = $this->client->request('GET', $this->repo_man_host . '/repositories/' . $user, [
+            $response = $this->client->request('GET', $this->repo_man_host . '/repositories?owner=' . $user, [
                 'headers' => [
                     'Accept' => 'application/json'
                 ]
