@@ -99,7 +99,9 @@ $app->post('/refresh', function(Request $request) use ($app) {
 
         // post an added event, if not already locally available
         if (!isset($local_repositories[$full_name])) {
-            $event = [
+
+            $app['rabbit-client']->publish(
+                [
                 'name' => 'repo-mon.repository.added',
                 'data' => [
                     'url' => $repository->getUrl(),
@@ -109,10 +111,9 @@ $app->post('/refresh', function(Request $request) use ($app) {
                     'owner' => $user['login'],
                     'dependency_manager' => $repository->getDependencyManager(),
                     'timezone' => $timezone,
-                ]
-            ];
-
-            $app['rabbit-client']->publish($event);
+                ],
+                'version' => '1.0.0'
+            ]);
         }
     }
 
@@ -133,15 +134,16 @@ $app->post('/repositories/{name}', function(Request $request, $name) use ($app){
     }
 
     // calculate hour & minute to schedule task here?
-    $event = [
-        'name' => $event,
-        'data' => [
-            'full_name' => $name,
-            'timezone' => $request->get('timezone'),
+    $app['rabbit-client']->publish(
+        [
+            'name' => $event,
+            'data' => [
+                'full_name' => $name,
+                'timezone' => $request->get('timezone'),
+            ],
+            'version' => '1.0.0'
         ]
-    ];
-
-    $app['rabbit-client']->publish($event);
+    );
 
     return $app->json($event);
 
@@ -169,15 +171,15 @@ $app->get('/authn-callback', function(Request $request) use ($app) {
 
     $app['session']->set('user', $user);
 
-    $event = [
+    $app['rabbit-client']->publish(
+        [
         'name' => 'repo-mon.token.added',
         'data' => [
             'user' => $user['login'],
             'token' => $token
-        ]
-    ];
-
-    $app['rabbit-client']->publish($event);
+        ],
+        'version' => '1.0.0'
+    ]);
 
     return $app->redirect('/');
 });
