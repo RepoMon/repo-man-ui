@@ -111,9 +111,24 @@ $app->post('/refresh', function(Request $request) use ($app) {
                     'owner' => $user['login'],
                     'dependency_manager' => $repository->getDependencyManager(),
                     'timezone' => $timezone,
+                    'private' => $repository->isPrivate()
                 ],
                 'version' => '1.0.0'
             ]);
+        }
+    }
+
+    // remove any repositories not available from the git remote host
+    foreach($local_repositories as $full_name => $repository) {
+        if (!isset($repositories[$full_name])) {
+            $app['rabbit-client']->publish(
+                [
+                    'name' => 'repo-mon.repository.removed',
+                    'data' => [
+                        'full_name' => $repository->getFullName(),
+                    ],
+                    'version' => '1.0.0'
+                ]);
         }
     }
 

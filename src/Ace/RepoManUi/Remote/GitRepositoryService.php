@@ -69,7 +69,8 @@ class GitRepositoryService
 
                 $description = $data['description'] ? : '';
                 $language = $data['language'] ? : '';
-                $repository = new Repository($data['html_url'], $description, $language);
+                $private = (bool) $data['private'];
+                $repository = new Repository($data['html_url'], $description, $language, $private);
                 $repository->setTimezone($timezone);
                 $repositories [$repository->getFullName()]= $repository;
 
