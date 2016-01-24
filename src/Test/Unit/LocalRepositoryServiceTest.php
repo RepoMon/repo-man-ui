@@ -47,7 +47,8 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
                 'lang' => 'PHP',
                 'dependency_manager' => 'composer',
                 'timezone' => 'Europe/London',
-                'active' => true
+                'active' => true,
+                'private' => false
             ]
         ];
         $this->whenLocalRepositoriesExist($user, $repos);
