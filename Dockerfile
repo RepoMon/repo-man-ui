@@ -38,11 +38,6 @@ RUN chmod +x  /home/app/run.sh
 # Install server configuration
 COPY build/nginx.conf /etc/nginx/
 
-#COPY build/php-fpm.conf /etc/php/fpm/
-#RUN mkdir -p /etc/php/fpm/pool.d
-#COPY build/www.conf /etc/php/fpm/pool.d/
-
-# WORKDIR /home/app/public
 
 USER root
 
