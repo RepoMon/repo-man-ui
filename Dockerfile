@@ -2,7 +2,7 @@ FROM php:7-fpm
 
 MAINTAINER Tim Rodger <tim.rodger@gmail.com>
 
-EXPOSE 80
+EXPOSE 9000
 
 RUN apt-get update -qq && \
     apt-get install -y \
@@ -10,8 +10,7 @@ RUN apt-get update -qq && \
     libicu-dev \
     zip \
     unzip \
-    git \
-    nginx
+    git
 
 # install bcmath and mbstring for videlalvaro/php-amqplib
 RUN docker-php-ext-install bcmath mbstring
@@ -27,17 +26,13 @@ COPY src/ /home/app/
 WORKDIR /home/app
 
 # remove any development cruft
-RUN rm -rf /home/app/vendor/*
+# RUN rm -rf /home/app/vendor/*
 
 # Install dependencies
 RUN composer install --prefer-dist && \
     apt-get clean
 
 RUN chmod +x  /home/app/run.sh
-
-# Install server configuration
-COPY build/nginx.conf /etc/nginx/
-
 
 USER root
 
