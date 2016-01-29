@@ -1,2 +1,2 @@
 # repo-man-ui
-UI for repo-man service
+A service that provides a web client UI for the repo-man service
