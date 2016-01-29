@@ -41,15 +41,22 @@ class Repository
     private $timezone = '';
 
     /**
+     * @var boolean
+     */
+    private $private;
+
+    /**
      * @param string $url
      * @param string $description
      * @param string $language
+     * @param bool $private
      */
-    public function __construct(string $url, string $description, string $language)
+    public function __construct(string $url, string $description, string $language, bool $private)
     {
         $this->url = $url;
         $this->description = $description;
         $this->language = $language;
+        $this->private = $private;
         $this->extractDependencyManager($language);
     }
 
@@ -141,6 +148,14 @@ class Repository
     public function setTimezone(string $timezone)
     {
         $this->timezone = $timezone;
+    }
+
+    /**
+     * @return bool|bool
+     */
+    public function isPrivate() : bool
+    {
+        return $this->private;
     }
 
     /**

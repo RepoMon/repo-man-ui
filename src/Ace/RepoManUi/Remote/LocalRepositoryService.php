@@ -40,7 +40,7 @@ class LocalRepositoryService
     public function getRepositories(string $user) : array
     {
         try {
-            $response = $this->client->request('GET', $this->repo_man_host . '/repositories/' . $user, [
+            $response = $this->client->request('GET', $this->repo_man_host . '/repositories?owner=' . $user, [
                 'headers' => [
                     'Accept' => 'application/json'
                 ]
@@ -48,7 +48,7 @@ class LocalRepositoryService
 
             $repositories = [];
             foreach (json_decode($response->getBody(), true) as $data) {
-                $repository = new Repository($data['url'], $data['description'], $data['lang']);
+                $repository = new Repository($data['url'], $data['description'], $data['lang'], $data['private']);
                 $repository->setTimezone($data['timezone']);
                 $repository->setActive($data['active'] == '1');
                 $repositories [$repository->getFullName()]= $repository;

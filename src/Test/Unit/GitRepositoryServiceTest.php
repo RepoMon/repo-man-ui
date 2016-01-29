@@ -59,7 +59,7 @@ class GitRepositoryServiceTest extends PHPUnit_Framework_TestCase
     {
         $user = 'agent-orange';
         $repos = [
-            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP', 'description' => 'A repository',]
+            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP', 'description' => 'A repository', 'private' => false]
         ];
 
         $this->whenGitRepositoriesExist($user, $repos);
@@ -81,7 +81,7 @@ class GitRepositoryServiceTest extends PHPUnit_Framework_TestCase
     {
         $user = 'agent-orange';
         $repos = [
-            ['html_url' => 'https://github.com/apps/service-a', 'language' => null, 'description' => 'A repository',]
+            ['html_url' => 'https://github.com/apps/service-a', 'language' => null, 'description' => 'A repository', 'private' => false]
         ];
 
         $this->whenGitRepositoriesExist($user, $repos);
@@ -99,7 +99,7 @@ class GitRepositoryServiceTest extends PHPUnit_Framework_TestCase
     {
         $user = 'agent-orange';
         $repos = [
-            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP', 'description' => null,]
+            ['html_url' => 'https://github.com/apps/service-a', 'language' => 'PHP', 'description' => null, 'private' => false]
         ];
 
         $this->whenGitRepositoriesExist($user, $repos);

@@ -31,7 +31,7 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     public function testGetDependencyManager($language, $manager)
     {
 
-        $repository = new Repository('https://github.com/owner/repo', 'A repository', $language);
+        $repository = new Repository('https://github.com/owner/repo', 'A repository', $language, false);
 
         $this->assertSame($manager, $repository->getDependencyManager());
     }
@@ -40,7 +40,7 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     public function testRepositoryIsInactiveByDefault()
     {
 
-        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript');
+        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript', false);
 
         $this->assertFalse($repository->isActive());
 
@@ -52,7 +52,7 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
     public function testTimezoneIsEmptyByDefault()
     {
 
-        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript');
+        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript', false);
 
         $this->assertSame('', $repository->getTimezone());
 
@@ -63,21 +63,21 @@ class RepositoryTest extends PHPUnit_Framework_TestCase
 
     public function testGetFullName()
     {
-        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript');
+        $repository = new Repository('https://github.com/owner/repo', 'A repository', 'JavaScript', false);
 
         $this->assertSame('owner/repo', $repository->getFullName());
     }
 
     public function testGetOwner()
     {
-        $repository = new Repository('https://github.com/timr/repo', 'A repository', 'JavaScript');
+        $repository = new Repository('https://github.com/timr/repo', 'A repository', 'JavaScript', false);
 
         $this->assertSame('timr', $repository->getOwner());
     }
 
     public function testGetName()
     {
-        $repository = new Repository('https://github.com/timr/repo', 'A repository', 'JavaScript');
+        $repository = new Repository('https://github.com/timr/repo', 'A repository', 'JavaScript', false);
 
         $this->assertSame('repo', $repository->getName());
     }

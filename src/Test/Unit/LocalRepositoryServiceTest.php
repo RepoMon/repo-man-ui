@@ -47,7 +47,8 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
                 'lang' => 'PHP',
                 'dependency_manager' => 'composer',
                 'timezone' => 'Europe/London',
-                'active' => true
+                'active' => true,
+                'private' => false
             ]
         ];
         $this->whenLocalRepositoriesExist($user, $repos);
@@ -91,7 +92,7 @@ class LocalRepositoryServiceTest extends PHPUnit_Framework_TestCase
 
         $this->mock_http_client->expects($this->any())
             ->method('request')
-            ->with('GET', $this->repo_man_host . '/repositories/' . $user, [
+            ->with('GET', $this->repo_man_host . '/repositories?owner=' . $user, [
                 'headers' => [
                     'Accept' => 'application/json'
                 ]])

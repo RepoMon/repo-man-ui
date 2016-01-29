@@ -17,9 +17,8 @@
     <ul id="repositories">
         {% for repo in repositories %}
         <li class="repository {% if repo.isActive() %}repository-active{% endif %}">
-            <span class="repository-name">{{ repo.getFullName() }}</span>
-            <span class="repository-description">{{ repo.getDescription() }}</span>
-            <span><input class="select_repo" id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked{% endif %} {% if repo.getLanguage() != 'PHP' %} disabled{% endif %}></span>
+            <span class="repository-name" title="{{ repo.getDescription() }}">{{ repo.getFullName() }}</span>
+            <span><input class="select_repo" id="{{ repo.getFullName() }}" type="checkbox"{% if repo.isActive() %} checked{% endif %}></span>
         </li>
         {% endfor %}
     </ul>
