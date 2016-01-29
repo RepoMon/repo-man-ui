@@ -24,19 +24,23 @@ CMD ["/home/app/run.sh"]
 # Move application files into place
 COPY src/ /home/app/
 
-COPY build/nginx.conf /etc/nginx/
-COPY build/php-fpm.conf /etc/php/fpm/
+WORKDIR /home/app
 
 # remove any development cruft
 RUN rm -rf /home/app/vendor/*
 
-RUN chmod +x  /home/app/run.sh
-
-WORKDIR /home/app
-
 # Install dependencies
 RUN composer install --prefer-dist && \
     apt-get clean
+
+RUN chmod +x  /home/app/run.sh
+
+# Install server configuration
+COPY build/nginx.conf /etc/nginx/
+
+#COPY build/php-fpm.conf /etc/php/fpm/
+#RUN mkdir -p /etc/php/fpm/pool.d
+#COPY build/www.conf /etc/php/fpm/pool.d/
 
 # WORKDIR /home/app/public
 
