@@ -25,6 +25,7 @@ CMD ["/home/app/run.sh"]
 COPY src/ /home/app/
 
 COPY build/nginx.conf /etc/nginx/
+COPY build/php-fpm.conf /etc/php/fpm/
 
 # remove any development cruft
 RUN rm -rf /home/app/vendor/*
