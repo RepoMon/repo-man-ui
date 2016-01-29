@@ -164,7 +164,7 @@ $app->get('/login', function(Request $request) use ($app){
  */
 $app->get('/authn-callback', function(Request $request) use ($app) {
 
-    $token = $app['authentication-service']->getAccessTokenFromCode($request->get('code'));
+    $token = $app['authentication-service']->getAccessTokenFromCode($request->query->get('code', 'invalid'));
     $user = $app['authentication-service']->getUserDataFromAccessToken($token);
 
     $app['session']->set('user', $user);
